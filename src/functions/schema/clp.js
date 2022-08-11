@@ -1,4 +1,5 @@
 import {checkSame} from '@Functions/object';
+import Parse from 'parse/node';
 
 const diffSchemaCLP = async (allCLP) => {
   let list = await Parse.Schema.all();

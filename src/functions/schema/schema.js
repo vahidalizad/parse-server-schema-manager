@@ -1,4 +1,6 @@
 import {checkSame} from '../object';
+import {syncSchemaWithObject} from './sync';
+import Parse from 'parse/node';
 
 const checkSecondProperties = ['type'];
 
