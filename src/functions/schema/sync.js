@@ -1,16 +1,6 @@
-export const ignoreIndexesKeys = ['_id_'];
+const ignoreIndexesKeys = ['_id_'];
 
-export const globalKeys = ['objectId', 'updatedAt', 'createdAt', 'ACL'];
-
-export const globalSimpleObj = {};
-
-export const iconObj = {
-  icon: {
-    type: 'Object',
-    options: {defaultValue: {type: 'none'}},
-  },
-  iconFile: {type: 'File', options: {}},
-};
+const globalKeys = ['objectId', 'updatedAt', 'createdAt', 'ACL'];
 
 export const syncSchemaWithObject = async (schema, obj, indexes = {}) => {
   let change = false;
