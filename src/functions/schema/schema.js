@@ -131,7 +131,7 @@ export const getAllSchemas = async (
           !ignoreTables.includes(b.className) &&
           (!ignoreAdditional || !ignoreAdditionalTables.includes(b.className))
         ) {
-          a[b.className] = b.indexes;
+          a[b.className] = b.indexes ?? {};
           delete a[b.className]['_id_'];
         }
         return a;
