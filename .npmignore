@@ -1,0 +1,9 @@
+.vscode/
+dev/
+src/
+.npmrc
+.babelrc
+.eslintrc.js
+.gitignore
+.gitlab-ci.yml
+.prettierrc
