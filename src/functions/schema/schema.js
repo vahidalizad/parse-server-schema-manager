@@ -155,7 +155,7 @@ export const manageSchema = async (schema, commit, remove, purge) => {
   if (!commit) return {...diff, indexChanges, commit, log: 'Nothing happened!'};
 
   for (let key in schema)
-    if (diff.add[key] || diff.change[key])
+    if (diff.add[key] || diff.change[key] || indexChanges[key])
       await syncSchemaWithObject(
         new Parse.Schema(key),
         schema[key].fields,
