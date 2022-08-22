@@ -1,3 +1,5 @@
+import {checkSame} from '..';
+
 const ignoreIndexesKeys = ['_id_'];
 
 const globalKeys = ['objectId', 'updatedAt', 'createdAt', 'ACL'];
