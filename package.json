@@ -1,6 +1,6 @@
 {
   "name": "@server-components/tools",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "tools of global servers based on parse",
   "main": "index.js",
   "publishConfig": {
