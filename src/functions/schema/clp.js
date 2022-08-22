@@ -6,6 +6,7 @@ const diffSchemaCLP = async (allCLP) => {
   let changes = {};
   for (let l of list) {
     let cl = l.className;
+    if (['_Role', '_Session'].includes(cl)) continue;
     let dbClp = l.classLevelPermissions;
     let nowClp = allCLP[cl];
     if (!checkSame(dbClp, nowClp)) {
