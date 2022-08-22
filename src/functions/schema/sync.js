@@ -1,4 +1,4 @@
-import {checkSame} from '..';
+import {checkSame} from '../object';
 
 const ignoreIndexesKeys = ['_id_'];
 
