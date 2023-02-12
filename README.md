@@ -1,3 +1,8 @@
-# Tools
+# Parse schema manager (With JSON)
 
-Server Components global functions and variables shared on all groups and projects based on parse
+```
+createDBMLFile
+manageCLP
+getAllSchemas
+manageSchema
+```

@@ -1,43 +1,33 @@
 {
-  "name": "@server-components/tools",
-  "version": "1.0.3",
-  "description": "tools of global servers based on parse",
+  "name": "parse-server-schema-manager",
+  "version": "1.0.0",
+  "description": "Parse server schema manager",
   "main": "index.js",
-  "publishConfig": {
-    "@server-components:registry": "https://gitlab.com/api/v4/projects/38508677/packages/npm/"
-  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "build": "babel src -d dist",
     "dev": "babel-node -r dotenv/config dev/index.js",
     "lint": "eslint dev/index.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://gitlab.com/server-components/tools.git"
+    "url": "git+https://github.com/vahidalizad/parse-server-schema-manager"
   },
-  "author": "Zegara",
+  "author": "Vahid Alizad",
   "license": "ISC",
-  "bugs": {
-    "url": "https://gitlab.com/server-components/tools/issues"
-  },
-  "homepage": "https://gitlab.com/server-components/tools#readme",
-  "dependencies": {
-    "pako": "^2.0.4",
-    "regression": "^2.0.1"
-  },
+  "homepage": "https://github.com/vahidalizad/parse-server-schema-manager",
+  "dependencies": {},
   "devDependencies": {
-    "@babel/cli": "^7.17.10",
-    "@babel/core": "^7.18.5",
-    "@babel/eslint-parser": "^7.18.2",
-    "@babel/node": "^7.18.5",
+    "@babel/cli": "^7.20.7",
+    "@babel/core": "^7.20.12",
+    "@babel/eslint-parser": "^7.19.1",
+    "@babel/node": "^7.20.7",
     "@babel/polyfill": "^7.12.1",
-    "@babel/preset-env": "^7.18.2",
-    "@babel/register": "^7.17.7",
-    "babel-plugin-module-resolver": "^4.1.0",
-    "dotenv": "^16.0.1",
-    "eslint": "^8.18.0",
-    "parse": "^3.4.2",
-    "yargs": "^17.5.1"
+    "@babel/preset-env": "^7.20.2",
+    "@babel/register": "^7.18.9",
+    "babel-plugin-module-resolver": "^5.0.0",
+    "dotenv": "^16.0.3",
+    "eslint": "^8.34.0",
+    "parse": "^4.0.1",
+    "yargs": "^17.6.2"
   }
 }
