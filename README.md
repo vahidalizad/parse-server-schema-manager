@@ -157,3 +157,37 @@ The function returns an object that shows changes and differences in an understa
 For more detailed information on how to define schemas and CLP objects, please refer to the [Parse Server Schema Documentation](https://docs.parseplatform.org/defined-schema/guide).
 
 Note that in this package, the class name is used as the key for the schema object, rather than being included inside the object alongside fields and indexes.
+
+## Integration and Advanced Usage
+
+### CI/CD Pipeline Integration
+
+You can easily integrate the schema and CLP management functions into your CI/CD pipeline. Simply initialize Parse Server in your pipeline script and run these functions. This allows you to automatically manage your database schema and permissions as part of your deployment process.
+
+### Parse Cloud Function
+
+Alternatively, you can create a Parse Cloud function to manage your schemas on-demand. This approach allows you to check for differences and apply changes manually. Here's an example of how to set this up:
+
+```javascript
+Parse.Cloud.define('configureSchemas', async (request) => {
+  if (!request.master) throw 'You can not access this function';
+  const commit = request.params?.commit;
+  const remove = request.params?.remove;
+  const purge = request.params?.purge;
+  const allSchemas = {
+    /* Define your schemas here */
+  };
+  return await manageSchema(allSchemas, commit, remove, purge);
+});
+```
+
+This Cloud function:
+
+- Requires a master key for access, ensuring security.
+- Accepts optional parameters for commit, remove, and purge operations.
+- Allows you to define your schemas within the function.
+- Returns the result of the manageSchema function.
+
+You can call this function using the Parse JavaScript SDK or REST API, providing the necessary parameters to check for differences or apply changes as needed.
+
+By implementing one of these approaches, you can maintain full control over your Parse Server schema and CLP management, whether as part of an automated process or on-demand.
