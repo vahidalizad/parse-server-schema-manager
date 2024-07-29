@@ -16,6 +16,20 @@ Parse Server Schema Manager is an npm package that implements "schema as code" f
 3. **Transparency**: Clearly see what changes are being made to your schema and CLPs, reducing the risk of unintended modifications.
 4. **Developer Experience**: Simplify the process of managing Parse Server schemas, allowing developers to focus on building features.
 
+## Install
+
+Install via **npm**
+
+```shell
+npm install parse-server-schema-manager
+```
+
+Install via **yarn**
+
+```shell
+yarn add parse-server-schema-manager
+```
+
 ## API Reference
 
 The parse-server-schema-manager package provides three main functions to manage your Parse Server schema:
@@ -38,6 +52,8 @@ Manages the Parse Server schema, allowing for additions, modifications, and dele
 #### Example:
 
 ```javascript
+import {manageSchema} from 'parse-server-schema-manager';
+
 const PLAYLIST_SCHEMA = () => {
   const obj = {
     user: {type: 'Pointer', options: {targetClass: '_User'}},
@@ -125,6 +141,8 @@ Manages Class Level Permissions (CLP) for Parse Server classes. This function al
 #### Example:
 
 ```javascript
+import {manageCLP} from 'parse-server-schema-manager';
+
 const allCLP = {
   Playlist: {
     find: {'*': true},
@@ -170,6 +188,8 @@ Creates a DBML (Database Markup Language) file from your Parse Server schemas, a
 #### Example:
 
 ```javascript
+import {createDBMLFile} from 'parse-server-schema-manager';
+
 const ADDITIONAL_POINTERS = {
   Playlist: {user: 'ref: < _User.objectId'},
 };
