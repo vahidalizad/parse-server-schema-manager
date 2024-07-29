@@ -140,6 +140,15 @@ export const getAllSchemas = async (
   return obj;
 };
 
+/**
+ * Manages the Parse Server schema, allowing for additions, modifications, and deletions.
+ * @param {Object} allSchemas - An object containing all schema definitions.
+ * @param {boolean} commit - Flag to apply changes to the database. If false, only shows differences.
+ * @param {boolean} remove - Flag to allow removal of columns and tables.
+ * @param {boolean} purge - Flag to allow purging of non-empty tables before removal.
+ * @returns {Object} An object detailing the changes made or to be made.
+ * @see {@link https://docs.parseplatform.org/defined-schema/guide|Parse Server Schema Documentation}
+ */
 export const manageSchema = async (schema, commit, remove, purge) => {
   let reviewFields = {};
   let reviewIndexes = {};

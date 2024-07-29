@@ -36,6 +36,13 @@ const syncSchemasCLP = async (allCLP, diff) => {
   }
 };
 
+/**
+ * Manages Class Level Permissions (CLP) for Parse Server classes.
+ * @param {Object} allCLP - An object containing CLP definitions for all classes.
+ * @param {boolean} commit - Flag to apply changes to the database. If false, only shows differences.
+ * @returns {Object} An object detailing the changes made or to be made to CLPs.
+ * @see {@link https://docs.parseplatform.org/defined-schema/guide|Parse Server CLP Documentation}
+ */
 export const manageCLP = async (allCLP, commit) => {
   let diff = await diffSchemaCLP(allCLP);
   if (commit) await syncSchemasCLP(allCLP, diff);

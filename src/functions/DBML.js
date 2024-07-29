@@ -29,6 +29,12 @@ const colorByIndex = (id) => {
   return colorsArray[index];
 };
 
+/**
+ * Creates a DBML (Database Markup Language) file from Parse Server schemas.
+ * @param {Object} additionalPointers - Additional pointer relationships to include in the DBML file.
+ * @param {string} filename - The name of the output DBML file.
+ * @returns {Promise<void>}
+ */
 export const createDBMLFile = async (
   additional = {},
   schemaDBML = '_SCHEMA.dbml'
