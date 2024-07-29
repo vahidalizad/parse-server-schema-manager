@@ -18,7 +18,7 @@ Parse Server Schema Manager is an npm package that implements "schema as code" f
 
 ## API Reference
 
-The parse-server-schema-manager package provides 2 main functions to manage your Parse Server schema:
+The parse-server-schema-manager package provides three main functions to manage your Parse Server schema:
 
 ### 1. manageSchema(allSchemas, commit, remove, purge)
 
@@ -157,6 +157,35 @@ The function returns an object that shows changes and differences in an understa
 For more detailed information on how to define schemas and CLP objects, please refer to the [Parse Server Schema Documentation](https://docs.parseplatform.org/defined-schema/guide).
 
 Note that in this package, the class name is used as the key for the schema object, rather than being included inside the object alongside fields and indexes.
+
+### 3. createDBMLFile(additionalPointers, filename)
+
+Creates a DBML (Database Markup Language) file from your Parse Server schemas, allowing for visual representation of your database structure.
+
+#### Parameters:
+
+- `additionalPointers` (Object): Additional pointer relationships to include in the DBML file.
+- `filename` (String): The name of the output DBML file.
+
+#### Example:
+
+```javascript
+const ADDITIONAL_POINTERS = {
+  Playlist: {user: 'ref: < _User.objectId'},
+};
+await createDBMLFile(ADDITIONAL_POINTERS, '_SCHEMA.dbml');
+```
+
+#### Behavior:
+
+- This function generates a DBML file based on your Parse Server schemas.
+- It creates the file in your main directory with the specified filename.
+- Additional pointers can be defined to represent relationships not explicitly in your schemas.
+
+#### Usage:
+
+After creating the DBML file, you can visualize it using various free, open-source tools by importing the file or copying and pasting its contents.
+This function allows you to easily generate a visual representation of your database schema, which can be useful for documentation, planning, and communication within your team.
 
 ## Integration and Advanced Usage
 
