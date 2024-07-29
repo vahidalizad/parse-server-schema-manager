@@ -20,7 +20,7 @@ Parse Server Schema Manager is an npm package that implements "schema as code" f
 
 The parse-server-schema-manager package provides four main functions to manage your Parse Server schema:
 
-### manageSchema(allSchemas, commit, remove, purge)
+### 1. manageSchema(allSchemas, commit, remove, purge)
 
 Manages the Parse Server schema, allowing for additions, modifications, and deletions. This function compares the provided schema definitions with the current database schema and can apply the differences.
 
@@ -83,7 +83,7 @@ This output provides a detailed breakdown of the changes:
 - `change`: Indicates modifications to existing tables or columns.
 - `indexChanges`: Displays any changes to indexes.
 
-### Schema Definition Structure:
+#### Schema Definition Structure:
 
 ```javascript
 const SCHEMA_NAME = () => {
@@ -101,11 +101,11 @@ const SCHEMA_NAME = () => {
 };
 ```
 
-### Behavior:
+#### Behavior:
 
-When all boolean flags (commit, remove, purge) are false, this function only shows the differences between the current database schema and your defined schema.
-Setting `commit` to true applies additions and changes to columns and tables.
-Setting `remove` to true allows removal of columns and tables.
-The `purge` flag is used when you want to remove a non-empty table, deleting all rows before removal.
+- When all boolean flags (commit, remove, purge) are false, this function only shows the differences between the current database schema and your defined schema.
+- Setting `commit` to true applies additions and changes to columns and tables.
+- Setting `remove` to true allows removal of columns and tables.
+- The `purge` flag is used when you want to remove a non-empty table, deleting all rows before removal.
 
 This function allows you to manage your Parse Server schema through code, providing version control, easy reviewing of changes, and flexible application of schema updates.
