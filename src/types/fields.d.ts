@@ -15,8 +15,15 @@ export interface pointerOptions {
   targetClass: string;
 }
 
+// export interface ParseField {
+//   type: FieldType;
+//   targetClass?: string;
+//   defaultValue?: string;
+//   required?: boolean;
+// }
+
 export interface ParseField {
-  type: FieldType;
+  [key: string]: string | boolean;
 }
 
 export interface ParseFieldString extends ParseField {

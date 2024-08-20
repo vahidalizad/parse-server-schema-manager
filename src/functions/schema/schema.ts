@@ -1,3 +1,4 @@
+import {ParseClassSchema} from '@Types/fields';
 import {checkSame} from '../object';
 import {syncSchemasCLP, syncSchemaWithObject} from './sync';
 import Parse from 'parse/node';
@@ -18,13 +19,6 @@ type Indexes = {
     [key: string]: any;
   };
 };
-
-interface RestSchema {
-  className: string;
-  fields?: Fields;
-  classLevelPermissions?: Parse.Schema.CLP;
-  indexes?: Indexes;
-}
 
 type DiffFieldsOutput = {
   change?: Record<string, Array<string>>;
@@ -205,7 +199,7 @@ export const getAllSchemas = async (
   );
   const returnList = [];
   for (let cls of clone) {
-    let obj: RestSchema = {className: cls.className};
+    let obj: ParseClassSchema = {className: cls.className};
     if (schemaParts.fields) {
       obj.fields = cls.fields;
       for (let atr of ignoreAttributes ?? [])
@@ -219,7 +213,7 @@ export const getAllSchemas = async (
   return returnList;
 };
 
-type AddRemoveSchema = Record<string, RestSchema>;
+type AddRemoveSchema = Record<string, ParseClassSchema>;
 
 type ChangeSchema = {
   [key: string]: DiffFieldsOutput | DiffIndexesOutput | DiffClPOutput;
@@ -233,8 +227,8 @@ type AddRemoveSchemaOutput = {
 type PartString = 'fields' | 'indexes' | 'classLevelPermissions';
 
 const diffSchemaChanges = (
-  existingSchema: Array<RestSchema>,
-  schema: Array<RestSchema>,
+  existingSchema: Array<ParseClassSchema>,
+  schema: Array<ParseClassSchema>,
   part: PartString,
   schemaOptions: SchemaOutputOptions
 ) => {
@@ -244,7 +238,7 @@ const diffSchemaChanges = (
     if (schemaOptions?.ignoreClasses?.includes(className)) continue;
     const existingCls = existingSchema.find(
       (c) => c.className === className
-    ) as RestSchema;
+    ) as ParseClassSchema;
     if (!existingCls) continue;
     const diff =
       part === 'fields'
@@ -265,8 +259,8 @@ const diffSchemaChanges = (
 };
 
 const addRemoveSchemaChanges = (
-  existingSchema: Array<RestSchema>,
-  schema: Array<RestSchema>,
+  existingSchema: Array<ParseClassSchema>,
+  schema: Array<ParseClassSchema>,
   schemaOptions: SchemaOutputOptions
 ) => {
   const add: AddRemoveSchema = {};
@@ -277,7 +271,7 @@ const addRemoveSchemaChanges = (
     if (schemaOptions?.ignoreClasses?.includes(className)) continue;
     const existingCls = existingSchema.find(
       (c) => c.className === className
-    ) as RestSchema;
+    ) as ParseClassSchema;
     if (existingCls) continue;
     add[className] = cls;
   }
@@ -285,7 +279,9 @@ const addRemoveSchemaChanges = (
   for (let cls of existingSchema) {
     const className = cls.className;
     if (schemaOptions?.ignoreClasses?.includes(className)) continue;
-    const newCls = schema.find((c) => c.className === className) as RestSchema;
+    const newCls = schema.find(
+      (c) => c.className === className
+    ) as ParseClassSchema;
     if (newCls) continue;
     remove[className] = cls;
   }
@@ -316,7 +312,7 @@ type ChangesDiff = {
   classLevelPermissions?: ChangeSchema;
 };
 export const manageSchema = async (
-  schema: Array<RestSchema>,
+  schema: Array<ParseClassSchema>,
   {commit = false, remove = false, purge = false}: SchemaManagerActions,
   actionParts: SchemaParts = {},
   schemaOptions: SchemaOutputOptions = {}

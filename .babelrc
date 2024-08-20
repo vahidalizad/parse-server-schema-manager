@@ -10,7 +10,8 @@
         "root": ["./src"],
         "alias": {
           "@Functions": "./src/functions",
-          "@Constants": "./src/constants"
+          "@Constants": "./src/constants",
+          "@Types": "./src/types"
         }
       }
     ]
