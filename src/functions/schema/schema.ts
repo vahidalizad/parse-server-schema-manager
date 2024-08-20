@@ -164,7 +164,7 @@ type DiffSchemaOutput = {
   classLevelPermissions?: DiffClPOutput;
 };
 
-const sanitizeSchemaParts = (parts: schemaParts) => {
+const sanitizeSchemaParts = (parts: SchemaParts) => {
   return Object.assign(
     {
       fields: true,
@@ -175,7 +175,7 @@ const sanitizeSchemaParts = (parts: schemaParts) => {
   );
 };
 
-const sanitizeSchemaOptions = (outputOptions: schemaOutputOptions) => {
+const sanitizeSchemaOptions = (outputOptions: SchemaOutputOptions) => {
   return Object.assign(
     {
       ignoreClasses: ['_Session'],
@@ -194,7 +194,7 @@ const sanitizeSchemaOptions = (outputOptions: schemaOutputOptions) => {
 export const diffingSchema = (
   obj1: RestSchema,
   obj2: RestSchema,
-  parts: schemaParts = {}
+  parts: SchemaParts = {}
 ): DiffSchemaOutput => {
   const changes: DiffSchemaOutput = {};
   const schemaParts = sanitizeSchemaParts(parts);
@@ -220,19 +220,19 @@ export const diffingSchema = (
   return changes;
 };
 
-type schemaParts = {
+type SchemaParts = {
   fields?: boolean;
   indexes?: boolean;
   classLevelPermissions?: boolean;
 };
-type schemaOutputOptions = {
+type SchemaOutputOptions = {
   ignoreClasses?: Array<string>;
   ignoreAttributes?: Array<string>;
 };
 
 export const getAllSchemas = async (
-  parts: schemaParts = {},
-  outputOptions: schemaOutputOptions = {}
+  parts: SchemaParts = {},
+  outputOptions: SchemaOutputOptions = {}
 ) => {
   const schemaParts = sanitizeSchemaParts(parts);
   const options = sanitizeSchemaOptions(outputOptions);
@@ -265,7 +265,7 @@ type ChangeSchema = {
   [key: string]: DiffFieldsOutput | DiffIndexesOutput | DiffClPOutput;
 };
 
-type addRemoveSchemaOutput = {
+type AddRemoveSchemaOutput = {
   add?: AddRemoveSchema;
   remove?: AddRemoveSchema;
 };
@@ -321,7 +321,7 @@ const addRemoveSchemaChanges = (
     remove[className] = cls;
   }
 
-  const output: addRemoveSchemaOutput = {};
+  const output: AddRemoveSchemaOutput = {};
   if (Object.keys(add).length) output.add = add;
   if (Object.keys(remove).length) output.remove = remove;
   return output;
@@ -336,7 +336,7 @@ const addRemoveSchemaChanges = (
 //  * @returns {Object} An object detailing the changes made or to be made.
 //  * @see {@link https://docs.parseplatform.org/defined-schema/guide|Parse Server Schema Documentation}
 //  */
-type schemaManagerActions = {
+type SchemaManagerActions = {
   commit: boolean;
   remove: boolean;
   purge: boolean;
@@ -348,9 +348,9 @@ type ChangesDiff = {
 };
 export const manageSchema = async (
   schema: Array<RestSchema>,
-  {commit = false, remove = false, purge = false}: schemaManagerActions,
-  actionParts: schemaParts = {},
-  schemaOptions: schemaOutputOptions = {}
+  {commit = false, remove = false, purge = false}: SchemaManagerActions,
+  actionParts: SchemaParts = {},
+  schemaOptions: SchemaOutputOptions = {}
 ) => {
   const schemaParts = sanitizeSchemaParts(actionParts);
   const options = sanitizeSchemaOptions(schemaOptions);
