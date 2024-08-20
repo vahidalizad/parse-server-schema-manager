@@ -12,7 +12,12 @@ module.exports = {
   reporter: 'spec',
   slow: '75',
   timeout: '2000',
-  require: ['@babel/register', 'test/hooks.js', 'mocha-suppress-logs'],
+  require: [
+    '@babel/register',
+    'ts-node/register',
+    'mocha-suppress-logs',
+    'test/hooks.js',
+  ],
   globals: ['Parse', 'testUsers'],
   extensions: ['ts', 'tsx', 'js', 'jsx'],
   exit: true,
