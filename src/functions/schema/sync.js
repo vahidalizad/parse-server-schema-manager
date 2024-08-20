@@ -4,6 +4,18 @@ const ignoreIndexesKeys = ['_id_'];
 
 const globalKeys = ['objectId', 'updatedAt', 'createdAt', 'ACL'];
 
+export const syncSchemasCLP = async (key, clp) => {
+  let schema = new Parse.Schema(key);
+  let available;
+  try {
+    available = await schema.get();
+  } catch (e) {}
+  if (available) {
+    schema.setCLP(clp);
+    await schema.update();
+  }
+};
+
 export const syncSchemaWithObject = async (schema, obj, indexes = {}) => {
   let available = {fields: {}, indexes: {}};
   try {

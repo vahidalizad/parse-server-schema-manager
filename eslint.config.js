@@ -7,6 +7,7 @@ module.exports = {
     sourceType: 'module',
     globals: {
       ...globals.node,
+      Parse: true,
     },
   },
   rules: {
