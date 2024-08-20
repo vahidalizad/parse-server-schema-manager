@@ -1,4 +1,5 @@
 .npmrc
+logs/
 dist/
 node_modules/
 .env

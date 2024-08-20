@@ -1,5 +1,7 @@
 .vscode/
 src/
+test/
+logs/
 .npmrc
 .babelrc
 .eslintrc.js
