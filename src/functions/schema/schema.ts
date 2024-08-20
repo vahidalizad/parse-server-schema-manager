@@ -36,11 +36,16 @@ type DiffFieldsOutput = {
   remove?: Fields;
 };
 
-export const diffingFields = (obj1: Fields, obj2: Fields): DiffFieldsOutput => {
+export const diffingFields = (
+  obj1: Fields,
+  obj2: Fields,
+  schemaOptions: SchemaOutputOptions
+): DiffFieldsOutput => {
   let add: Fields = {};
   let remove: Fields = {};
   let change: ChangeFields = {};
   for (let key in obj2) {
+    if (schemaOptions?.ignoreAttributes?.includes(key)) continue;
     if (!obj1[key]) add[key] = obj2[key];
     else {
       for (let pr of checkSecondProperties)
@@ -71,7 +76,10 @@ export const diffingFields = (obj1: Fields, obj2: Fields): DiffFieldsOutput => {
         }
     }
   }
-  for (let key in obj1) if (!obj2[key]) remove[key] = obj1[key];
+  for (let key in obj1) {
+    if (schemaOptions?.ignoreAttributes?.includes(key)) continue;
+    if (!obj2[key]) remove[key] = obj1[key];
+  }
 
   const output: DiffFieldsOutput = {};
   if (Object.keys(add).length) output.add = add;
@@ -158,12 +166,6 @@ export const diffingCLP = (obj1: CLP, obj2: CLP): DiffClPOutput => {
   return change;
 };
 
-type DiffSchemaOutput = {
-  fields?: DiffFieldsOutput;
-  indexes?: DiffIndexesOutput;
-  classLevelPermissions?: DiffClPOutput;
-};
-
 const sanitizeSchemaParts = (parts: SchemaParts) => {
   return Object.assign(
     {
@@ -189,35 +191,6 @@ const sanitizeSchemaOptions = (outputOptions: SchemaOutputOptions) => {
     },
     outputOptions
   );
-};
-
-export const diffingSchema = (
-  obj1: RestSchema,
-  obj2: RestSchema,
-  parts: SchemaParts = {}
-): DiffSchemaOutput => {
-  const changes: DiffSchemaOutput = {};
-  const schemaParts = sanitizeSchemaParts(parts);
-
-  if (schemaParts.fields) {
-    const diff = diffingFields(obj1.fields as Fields, obj2.fields as Fields);
-    if (Object.keys(diff).length) changes.fields = diff;
-  }
-  if (schemaParts.indexes) {
-    const diff = diffingIndexes(
-      obj1.indexes as Indexes,
-      obj2.indexes as Indexes
-    );
-    if (Object.keys(diff).length) changes.indexes = diff;
-  }
-  if (schemaParts.classLevelPermissions) {
-    const diff = diffingCLP(
-      obj1.classLevelPermissions as CLP,
-      obj2.classLevelPermissions as CLP
-    );
-    if (Object.keys(diff).length) changes.classLevelPermissions = diff;
-  }
-  return changes;
 };
 
 type SchemaParts = {
@@ -275,18 +248,24 @@ type PartString = 'fields' | 'indexes' | 'classLevelPermissions';
 const diffSchemaChanges = (
   existingSchema: Array<RestSchema>,
   schema: Array<RestSchema>,
-  part: PartString
+  part: PartString,
+  schemaOptions: SchemaOutputOptions
 ) => {
   const change: ChangeSchema = {};
   for (let cls of schema) {
     const className = cls.className;
+    if (schemaOptions?.ignoreClasses?.includes(className)) continue;
     const existingCls = existingSchema.find(
       (c) => c.className === className
     ) as RestSchema;
     if (!existingCls) continue;
     const diff =
       part === 'fields'
-        ? diffingFields(existingCls.fields as Fields, cls.fields as Fields)
+        ? diffingFields(
+            existingCls.fields as Fields,
+            cls.fields as Fields,
+            schemaOptions
+          )
         : part === 'indexes'
         ? diffingIndexes(existingCls.indexes as Indexes, cls.indexes as Indexes)
         : diffingCLP(
@@ -300,13 +279,15 @@ const diffSchemaChanges = (
 
 const addRemoveSchemaChanges = (
   existingSchema: Array<RestSchema>,
-  schema: Array<RestSchema>
+  schema: Array<RestSchema>,
+  schemaOptions: SchemaOutputOptions
 ) => {
   const add: AddRemoveSchema = {};
   const remove: AddRemoveSchema = {};
 
   for (let cls of schema) {
     const className = cls.className;
+    if (schemaOptions?.ignoreClasses?.includes(className)) continue;
     const existingCls = existingSchema.find(
       (c) => c.className === className
     ) as RestSchema;
@@ -316,6 +297,7 @@ const addRemoveSchemaChanges = (
 
   for (let cls of existingSchema) {
     const className = cls.className;
+    if (schemaOptions?.ignoreClasses?.includes(className)) continue;
     const newCls = schema.find((c) => c.className === className) as RestSchema;
     if (newCls) continue;
     remove[className] = cls;
@@ -356,14 +338,15 @@ export const manageSchema = async (
   const options = sanitizeSchemaOptions(schemaOptions);
 
   const existingSchema = await getAllSchemas(actionParts, options);
-  const addRemove = addRemoveSchemaChanges(existingSchema, schema);
+  const addRemove = addRemoveSchemaChanges(existingSchema, schema, options);
   const changesDiff: ChangesDiff = {};
   for (let key in schemaParts)
     if (schemaParts[key as PartString] as boolean | undefined)
       changesDiff[key as PartString] = diffSchemaChanges(
         existingSchema,
         schema,
-        key as PartString
+        key as PartString,
+        options
       );
 
   let log = 'Nothing changed!';
@@ -403,5 +386,14 @@ export const manageSchema = async (
       log = 'Schema synced!';
     }
 
-  return {...addRemove, ...changesDiff, commit, log: 'Nothing happened!'};
+  const output: Record<string, any> = {...addRemove, log};
+  if (Object.keys(changesDiff).length) {
+    let tempChanges: Record<string, any> = {};
+    for (let key in changesDiff) {
+      if (Object.keys(changesDiff[key as PartString] ?? {}).length)
+        tempChanges[key] = changesDiff[key as PartString];
+    }
+    if (Object.keys(tempChanges).length) output.changes = tempChanges;
+  }
+  return output;
 };

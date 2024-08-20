@@ -1,6 +1,7 @@
 import {describe, it} from 'mocha';
 import testSchemas from '../assets/schema.json';
-import {manageSchema} from 'src';
+import {manageSchema} from '@Functions/schema';
+import {expect} from 'chai';
 
 const schema = testSchemas[0];
 const actionParts = {fields: true};
@@ -10,11 +11,12 @@ describe('Test Manage Schema', function () {
   it('test diffs field of a schema class', async function () {
     const actions = {commit: false};
     const result = await manageSchema(
-      schema,
+      [schema],
       actions,
       actionParts,
       schemaOptions
     );
+    debugger;
     expect(result).to.deep.equal([
       {
         className: '_User',
