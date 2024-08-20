@@ -1,6 +1,7 @@
 import {describe, it} from 'mocha';
 import {expect} from 'chai';
-import {diffingFields, getAllSchemas} from '@Functions/schema';
+import Parse from 'parse/node';
+import {diffingFields, diffingIndexes, getAllSchemas} from '@Functions/schema';
 
 describe('Schema Management', function () {
   it('test getAllSchemas output', async function () {
@@ -8,7 +9,7 @@ describe('Schema Management', function () {
       ignoreClasses: [Parse.Role.className, 'Article', 'Project'],
       ignoreAttributes: ['authData'],
     };
-    let list = await getAllSchemas(
+    const list = await getAllSchemas(
       {
         indexes: false,
         classLevelPermissions: false,
@@ -30,7 +31,7 @@ describe('Schema Management', function () {
         },
       },
     ]);
-    let list2 = await getAllSchemas({fields: false}, options);
+    const list2 = await getAllSchemas({fields: false}, options);
     expect(list2).to.deep.equal([
       {
         className: '_User',
@@ -56,7 +57,7 @@ describe('Schema Management', function () {
   });
 
   it('test diffing of fields object', async function () {
-    let diffs = diffingFields(
+    const diffs = diffingFields(
       {
         objectId: {type: 'String'},
         createdAt: {type: 'Date'},
@@ -81,6 +82,29 @@ describe('Schema Management', function () {
       remove: {
         users: {type: 'Relation', targetClass: '_User'},
         roles: {type: 'Relation', targetClass: '_Role'},
+      },
+    });
+  });
+
+  it('test diffing of indexes', async function () {
+    const diffs = diffingIndexes(
+      {
+        _id_: {_id: 1},
+        email_1: {email: 1},
+        username_1: {username: 1},
+      },
+      {
+        _id_: {_objectId: 1},
+        email_1: {email: -1},
+        username_2: {username: 1},
+      }
+    );
+    expect(diffs).to.deep.equal({
+      add: {username_2: {username: 1}},
+      remove: {username_1: {username: 1}},
+      change: {
+        _id_: {from: {_id: 1}, to: {_objectId: 1}},
+        email_1: {from: {email: 1}, to: {email: -1}},
       },
     });
   });

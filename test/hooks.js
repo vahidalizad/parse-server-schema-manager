@@ -86,6 +86,7 @@ export async function mochaGlobalSetup() {
   Parse.CoreManager.set('MASTER_KEY', 'devdevdev');
 
   await isReady();
+  await wait(1000);
 }
 
 export function mochaGlobalTeardown() {

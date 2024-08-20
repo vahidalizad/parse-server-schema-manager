@@ -106,28 +106,44 @@ export const diffingFields = (obj1: Fields, obj2: Fields) => {
 //   return {add, remove, change};
 // };
 
-// const addDiffIndexes = (obj1, obj2) => {
-//   let indexChanges = {};
-//   for (let key in obj2) {
-//     let oldInd = {};
-//     let toInd = {};
-//     let diff = (key2) => {
-//       if (!checkSame(obj1[key]?.[key2], obj2[key]?.[key2])) {
-//         oldInd[key2] = obj1[key]?.[key2];
-//         toInd[key2] = obj2[key]?.[key2];
-//       }
-//     };
-//     for (let key2 in obj2[key] ?? {}) diff(key2);
-//     for (let key2 in obj1[key] ?? {}) diff(key2);
-//     if (Object.keys(oldInd).length) {
-//       indexChanges[key] = {
-//         from: oldInd,
-//         to: toInd,
-//       };
-//     }
-//   }
-//   return indexChanges;
-// };
+type ChangedIndex = {
+  [key: string]: Indexes;
+};
+
+type ChangedIndexesMap = {
+  [key: string]: ChangedIndex;
+};
+
+type AddOrRemoveIndexes = {
+  [key: string]: Indexes;
+};
+
+export const diffingIndexes = (obj1: Indexes, obj2: Indexes) => {
+  const change: ChangedIndexesMap = {};
+  const add: AddOrRemoveIndexes = {};
+  const remove: AddOrRemoveIndexes = {};
+
+  for (let key in obj1) if (!obj2[key]) remove[key] = obj1[key];
+
+  for (let key in obj2) {
+    if (!obj1[key]) {
+      add[key] = obj2[key];
+      continue;
+    }
+    const allKeys = [
+      ...new Set([...Object.keys(obj1[key]), ...Object.keys(obj2[key])]),
+    ];
+    if (
+      allKeys.some((key2) => !checkSame(obj1[key]?.[key2], obj2[key]?.[key2]))
+    ) {
+      change[key] = {
+        from: obj1[key],
+        to: obj2[key],
+      };
+    }
+  }
+  return {add, remove, change};
+};
 
 type schemaParts = {
   fields?: boolean;
