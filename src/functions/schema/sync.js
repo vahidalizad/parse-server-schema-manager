@@ -4,40 +4,33 @@ const ignoreIndexesKeys = ['_id_'];
 
 const globalKeys = ['objectId', 'updatedAt', 'createdAt', 'ACL'];
 
-export const syncSchemasCLP = async (key, clp) => {
-  let schema = new Parse.Schema(key);
-  let available;
-  try {
-    available = await schema.get();
-  } catch (e) {}
-  if (available) {
-    schema.setCLP(clp);
-    await schema.update();
-  }
-};
-
-export const syncSchemaWithObject = async (schema, obj, indexes = {}) => {
-  let available = {fields: {}, indexes: {}};
+export const syncSchemaWithObject = async (className, schemaObject) => {
+  const schema = new Parse.Schema(className);
+  let available = {fields: {}, indexes: {}, classLevelPermissions: {}};
   try {
     available = await schema.get();
   } catch (e) {
     // throw e;
   }
 
-  // sync fields
-  for (let key in obj)
-    if (!available.fields || !available.fields[key])
-      schema.addField(key, obj[key].type, obj[key].options);
+  const fields = schemaObject.fields;
+  const indexes = schemaObject.indexes;
+  const CLP = schemaObject.classLevelPermissions;
 
-  let objectFields = Object.keys(obj);
+  // sync fields
+  for (let key in fields)
+    if (!available.fields || !available.fields[key])
+      schema.addField(key, fields[key].type, fields[key].options);
+
+  let objectFields = Object.keys(fields);
   for (let cKey in available.fields)
     if (!objectFields.includes(cKey) && !globalKeys.includes(cKey))
       schema.deleteField(cKey);
 
   // update fields options
   for (let cKey in available.fields) {
-    if (!obj[cKey]) continue;
-    let cache = JSON.parse(JSON.stringify(obj[cKey]));
+    if (!fields[cKey]) continue;
+    let cache = JSON.parse(JSON.stringify(fields[cKey]));
     cache = {...cache, ...(cache.options ?? {})};
     delete cache['options'];
 
@@ -49,7 +42,7 @@ export const syncSchemaWithObject = async (schema, obj, indexes = {}) => {
     if (!checkSame(availableCache, cache)) {
       if (availableCache.type !== cache.type)
         throw `Can't change type of a column you got to remove it then add it.`;
-      schema.addField(cKey, obj[cKey].type, obj[cKey].options);
+      schema.addField(cKey, fields[cKey].type, fields[cKey].options);
     }
   }
 
@@ -78,6 +71,9 @@ export const syncSchemaWithObject = async (schema, obj, indexes = {}) => {
         schema.addIndex(cKey, indexes[cKey]);
     }
   }
+
+  // sync CLP
+  schema.setCLP(CLP);
 
   return Object.keys(available.fields).length ? schema.update() : schema.save();
 };

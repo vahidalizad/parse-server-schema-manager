@@ -1,6 +1,6 @@
 import {ParseClassSchema} from '@Types/fields';
 import {checkSame} from '../object';
-import {syncSchemasCLP, syncSchemaWithObject} from './sync';
+import {syncSchemaWithObject} from './sync';
 import Parse from 'parse/node';
 
 const checkSecondProperties = ['type'];
@@ -335,11 +335,7 @@ export const manageSchema = async (
   let log = 'Nothing changed!';
   if (commit) {
     for (let key in addRemove.add ?? {})
-      await syncSchemaWithObject(
-        new Parse.Schema(key),
-        addRemove.add?.[key].fields,
-        addRemove.add?.[key].indexes
-      );
+      await syncSchemaWithObject(key, addRemove.add?.[key]);
 
     let keysToSync: Set<string> | Array<string> = new Set();
     for (let classKey in changesDiff.fields ?? {}) keysToSync.add(classKey);
@@ -348,15 +344,8 @@ export const manageSchema = async (
 
     for (let key of keysToSync) {
       const cls = schema.find((t) => t.className === key);
-      await syncSchemaWithObject(
-        new Parse.Schema(key),
-        cls?.fields,
-        cls?.indexes
-      );
+      await syncSchemaWithObject(new Parse.Schema(key), cls);
     }
-
-    for (let key in changesDiff.classLevelPermissions ?? {})
-      await syncSchemasCLP(key, changesDiff.classLevelPermissions?.[key]);
 
     log = 'Schema synced!';
   }
