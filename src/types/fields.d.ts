@@ -15,6 +15,7 @@ export interface pointerOptions {
   targetClass: string;
 }
 
+// TODO: ali fix it this should be this one not the bellow one but it gives error
 // export interface ParseField {
 //   type: FieldType;
 //   targetClass?: string;
