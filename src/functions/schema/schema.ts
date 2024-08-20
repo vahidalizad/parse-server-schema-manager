@@ -6,17 +6,6 @@ const checkSecondProperties = ['type'];
 
 const checkOptions = ['targetClass', 'required', 'defaultValue'];
 
-const ignoreTables = ['_Session', '_Role'];
-const ignoreAdditionalTables = ['_User'];
-const ignoreAttributes = [
-  'ACL',
-  'password',
-  'authData',
-  'emailVerified',
-  'email',
-];
-const ignoreAdditionalAttributes = ['objectId', 'createdAt', 'updatedAt'];
-
 type FieldOptions = {
   [key: string]: string | boolean;
 };
@@ -175,13 +164,8 @@ type DiffSchemaOutput = {
   classLevelPermissions?: DiffClPOutput;
 };
 
-export const diffingSchema = (
-  obj1: RestSchema,
-  obj2: RestSchema,
-  parts: schemaParts = {}
-): DiffSchemaOutput => {
-  const changes: DiffSchemaOutput = {};
-  const schemaParts = Object.assign(
+const sanitizeSchemaParts = (parts: schemaParts) => {
+  return Object.assign(
     {
       fields: true,
       indexes: true,
@@ -189,6 +173,32 @@ export const diffingSchema = (
     },
     parts
   );
+};
+
+const sanitizeSchemaOptions = (outputOptions: schemaOutputOptions) => {
+  return Object.assign(
+    {
+      ignoreClasses: ['_Session'],
+      ignoreAttributes: [
+        'ACL',
+        'password',
+        'authData',
+        'emailVerified',
+        'email',
+      ],
+    },
+    outputOptions
+  );
+};
+
+export const diffingSchema = (
+  obj1: RestSchema,
+  obj2: RestSchema,
+  parts: schemaParts = {}
+): DiffSchemaOutput => {
+  const changes: DiffSchemaOutput = {};
+  const schemaParts = sanitizeSchemaParts(parts);
+
   if (schemaParts.fields) {
     const diff = diffingFields(obj1.fields as Fields, obj2.fields as Fields);
     if (Object.keys(diff).length) changes.fields = diff;
@@ -224,21 +234,9 @@ export const getAllSchemas = async (
   parts: schemaParts = {},
   outputOptions: schemaOutputOptions = {}
 ) => {
-  const schemaParts = Object.assign(
-    {
-      fields: true,
-      indexes: true,
-      classLevelPermissions: true,
-    },
-    parts
-  );
-  const options = Object.assign(
-    {
-      ignoreClasses: [],
-      ignoreAttributes: [],
-    },
-    outputOptions
-  );
+  const schemaParts = sanitizeSchemaParts(parts);
+  const options = sanitizeSchemaOptions(outputOptions);
+
   const {ignoreClasses, ignoreAttributes} = options;
   const list = await Parse.Schema.all();
   const clone = structuredClone(list).filter(
@@ -276,8 +274,12 @@ type schemaManagerActions = {
 };
 export const manageSchema = async (
   schema: Array<RestSchema>,
-  {commit = false, remove = false, purge = false}: schemaManagerActions
+  {commit = false, remove = false, purge = false}: schemaManagerActions,
+  actionParts: schemaParts = {},
+  schemaOptions: schemaOutputOptions = {}
 ) => {
+  const schemaParts = sanitizeSchemaParts(actionParts);
+  const options = sanitizeSchemaOptions(schemaOptions);
   //   let reviewFields = {};
   //   let reviewIndexes = {};
   //   for (let key in schema) {
