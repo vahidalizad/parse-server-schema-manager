@@ -19,10 +19,6 @@ type Indexes = {
   };
 };
 
-type ChangeFields = {
-  [key: string]: Array<string>;
-};
-
 interface RestSchema {
   className: string;
   fields?: Fields;
@@ -31,7 +27,7 @@ interface RestSchema {
 }
 
 type DiffFieldsOutput = {
-  change?: ChangeFields;
+  change?: Record<string, Array<string>>;
   add?: Fields;
   remove?: Fields;
 };
@@ -43,7 +39,7 @@ export const diffingFields = (
 ): DiffFieldsOutput => {
   let add: Fields = {};
   let remove: Fields = {};
-  let change: ChangeFields = {};
+  let change: Record<string, Array<string>> = {};
   for (let key in obj2) {
     if (schemaOptions?.ignoreAttributes?.includes(key)) continue;
     if (!obj1[key]) add[key] = obj2[key];
@@ -88,17 +84,11 @@ export const diffingFields = (
   return output;
 };
 
-type ChangedIndex = {
-  [key: string]: Indexes;
-};
-
 type ChangedIndexesMap = {
-  [key: string]: ChangedIndex;
+  [key: string]: Record<string, Indexes>;
 };
 
-type AddOrRemoveIndexes = {
-  [key: string]: Indexes;
-};
+type AddOrRemoveIndexes = Record<string, Indexes>;
 
 type DiffIndexesOutput = {
   change?: ChangedIndexesMap;
@@ -146,9 +136,7 @@ type CLP = {
   };
 };
 
-type DiffClPOutput = {
-  [key: string]: CLP;
-};
+type DiffClPOutput = Record<string, CLP>;
 
 export const diffingCLP = (obj1: CLP, obj2: CLP): DiffClPOutput => {
   const change: DiffClPOutput = {};
@@ -231,9 +219,8 @@ export const getAllSchemas = async (
   return returnList;
 };
 
-type AddRemoveSchema = {
-  [key: string]: RestSchema;
-};
+type AddRemoveSchema = Record<string, RestSchema>;
+
 type ChangeSchema = {
   [key: string]: DiffFieldsOutput | DiffIndexesOutput | DiffClPOutput;
 };
