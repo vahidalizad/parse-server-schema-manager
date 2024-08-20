@@ -1,5 +1,5 @@
 import {checkSame} from '../object';
-import {syncSchemaWithObject} from './sync';
+import {syncSchemasCLP, syncSchemaWithObject} from './sync';
 import Parse from 'parse/node';
 
 const checkSecondProperties = ['type'];
@@ -258,6 +258,75 @@ export const getAllSchemas = async (
   return returnList;
 };
 
+type AddRemoveSchema = {
+  [key: string]: RestSchema;
+};
+type ChangeSchema = {
+  [key: string]: DiffFieldsOutput | DiffIndexesOutput | DiffClPOutput;
+};
+
+type addRemoveSchemaOutput = {
+  add?: AddRemoveSchema;
+  remove?: AddRemoveSchema;
+};
+
+type PartString = 'fields' | 'indexes' | 'classLevelPermissions';
+
+const diffSchemaChanges = (
+  existingSchema: Array<RestSchema>,
+  schema: Array<RestSchema>,
+  part: PartString
+) => {
+  const change: ChangeSchema = {};
+  for (let cls of schema) {
+    const className = cls.className;
+    const existingCls = existingSchema.find(
+      (c) => c.className === className
+    ) as RestSchema;
+    if (!existingCls) continue;
+    const diff =
+      part === 'fields'
+        ? diffingFields(existingCls.fields as Fields, cls.fields as Fields)
+        : part === 'indexes'
+        ? diffingIndexes(existingCls.indexes as Indexes, cls.indexes as Indexes)
+        : diffingCLP(
+            existingCls.classLevelPermissions as CLP,
+            cls.classLevelPermissions as CLP
+          );
+    if (Object.keys(diff).length) change[className] = diff;
+  }
+  return change;
+};
+
+const addRemoveSchemaChanges = (
+  existingSchema: Array<RestSchema>,
+  schema: Array<RestSchema>
+) => {
+  const add: AddRemoveSchema = {};
+  const remove: AddRemoveSchema = {};
+
+  for (let cls of schema) {
+    const className = cls.className;
+    const existingCls = existingSchema.find(
+      (c) => c.className === className
+    ) as RestSchema;
+    if (existingCls) continue;
+    add[className] = cls;
+  }
+
+  for (let cls of existingSchema) {
+    const className = cls.className;
+    const newCls = schema.find((c) => c.className === className) as RestSchema;
+    if (newCls) continue;
+    remove[className] = cls;
+  }
+
+  const output: addRemoveSchemaOutput = {};
+  if (Object.keys(add).length) output.add = add;
+  if (Object.keys(remove).length) output.remove = remove;
+  return output;
+};
+
 // /**
 //  * Manages the Parse Server schema, allowing for additions, modifications, and deletions.
 //  * @param {Object} allSchemas - An object containing all schema definitions.
@@ -272,6 +341,11 @@ type schemaManagerActions = {
   remove: boolean;
   purge: boolean;
 };
+type ChangesDiff = {
+  fields?: ChangeSchema;
+  indexes?: ChangeSchema;
+  classLevelPermissions?: ChangeSchema;
+};
 export const manageSchema = async (
   schema: Array<RestSchema>,
   {commit = false, remove = false, purge = false}: schemaManagerActions,
@@ -280,29 +354,54 @@ export const manageSchema = async (
 ) => {
   const schemaParts = sanitizeSchemaParts(actionParts);
   const options = sanitizeSchemaOptions(schemaOptions);
-  //   let reviewFields = {};
-  //   let reviewIndexes = {};
-  //   for (let key in schema) {
-  //     reviewFields[key] = schema[key].fields;
-  //     reviewIndexes[key] = schema[key].indexes;
-  //   }
-  //   let existingSchema = await getAllSchemas(true, true);
-  //   let diff = diffingObject(existingSchema.fields, reviewFields);
-  //   let indexChanges = addDiffIndexes(existingSchema.indexes, reviewIndexes);
-  //   if (!commit) return {...diff, indexChanges, commit, log: 'Nothing happened!'};
-  //   for (let key in schema)
-  //     if (diff.add[key] || diff.change[key] || indexChanges[key])
-  //       await syncSchemaWithObject(
-  //         new Parse.Schema(key),
-  //         schema[key].fields,
-  //         schema[key].indexes
-  //       );
-  //   // remove removed classes
-  //   if (remove)
-  //     for (let key in diff.remove ?? {}) {
-  //       const mySchema = new Parse.Schema(key);
-  //       if (purge) await mySchema.purge();
-  //       await mySchema.delete();
-  //     }
-  //   return {...diff, indexChanges, commit, log: 'Schema changed!'};
+
+  const existingSchema = await getAllSchemas(actionParts, options);
+  const addRemove = addRemoveSchemaChanges(existingSchema, schema);
+  const changesDiff: ChangesDiff = {};
+  for (let key in schemaParts)
+    if (schemaParts[key as PartString] as boolean | undefined)
+      changesDiff[key as PartString] = diffSchemaChanges(
+        existingSchema,
+        schema,
+        key as PartString
+      );
+
+  let log = 'Nothing changed!';
+  if (commit) {
+    for (let key in addRemove.add ?? {})
+      await syncSchemaWithObject(
+        new Parse.Schema(key),
+        addRemove.add?.[key].fields,
+        addRemove.add?.[key].indexes
+      );
+
+    let keysToSync: Set<string> | Array<string> = new Set();
+    for (let classKey in changesDiff.fields ?? {}) keysToSync.add(classKey);
+    for (let classKey in changesDiff.indexes ?? {}) keysToSync.add(classKey);
+    keysToSync = [...keysToSync];
+
+    for (let key of keysToSync) {
+      const cls = schema.find((t) => t.className === key);
+      await syncSchemaWithObject(
+        new Parse.Schema(key),
+        cls?.fields,
+        cls?.indexes
+      );
+    }
+
+    for (let key in changesDiff.classLevelPermissions ?? {})
+      await syncSchemasCLP(key, changesDiff.classLevelPermissions?.[key]);
+
+    log = 'Schema synced!';
+  }
+
+  if (remove)
+    for (let key in addRemove.remove ?? {}) {
+      const mySchema = new Parse.Schema(key);
+      if (purge) await mySchema.purge();
+      await mySchema.delete();
+      log = 'Schema synced!';
+    }
+
+  return {...addRemove, ...changesDiff, commit, log: 'Nothing happened!'};
 };
