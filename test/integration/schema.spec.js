@@ -71,13 +71,17 @@ describe('Schema Management', function () {
         createdAt: {type: 'Date'},
         updatedAt: {type: 'Date'},
         ACL: {type: 'ACL'},
-        name: {type: 'String', requred: true},
+        name: {type: 'String', required: true},
         followers: {type: 'Relation', targetClass: '_User'},
       }
     );
-    console.log(diffs);
-    debugger;
-    let q = await new Parse.Query(Parse.User).findAll({useMasterKey: true});
-    expect(q).to.be.an('array');
+    expect(diffs).to.deep.equal({
+      add: {followers: {type: 'Relation', targetClass: '_User'}},
+      change: {name: ['required: undefined -> true']},
+      remove: {
+        users: {type: 'Relation', targetClass: '_User'},
+        roles: {type: 'Relation', targetClass: '_Role'},
+      },
+    });
   });
 });

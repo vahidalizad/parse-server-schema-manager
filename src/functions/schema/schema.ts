@@ -36,8 +36,8 @@ type ChangeFields = {
 
 interface RestSchema {
   className: string;
-  fields: Fields;
-  classLevelPermissions: Parse.Schema.CLP;
+  fields?: Fields;
+  classLevelPermissions?: Parse.Schema.CLP;
   indexes?: Indexes;
 }
 
@@ -129,52 +129,55 @@ export const diffingFields = (obj1: Fields, obj2: Fields) => {
 //   return indexChanges;
 // };
 
-// type schemaParts {
-//   fields?: boolean;
-//   indexes?: ?boolean;
-//   classLevelPermissions?: boolean;
-// }
-// type schemaOutputOptions {
-//   ignoreClasses?: Array<string>;
-//   ignoreAttributes?: Array<string>;
-// }
+type schemaParts = {
+  fields?: boolean;
+  indexes?: boolean;
+  classLevelPermissions?: boolean;
+};
+type schemaOutputOptions = {
+  ignoreClasses?: Array<string>;
+  ignoreAttributes?: Array<string>;
+};
 
-// export const getAllSchemas = async (parts: schemaParts = {}, outputOptions: schemaOutputOptions = {}) => {
-//   const schemaParts = Object.assign(
-//     {
-//       fields: true,
-//       indexes: true,
-//       classLevelPermissions: true,
-//     },
-//     parts
-//   );
-//   const options = Object.assign(
-//     {
-//       ignoreClasses: [],
-//       ignoreAttributes: [],
-//     },
-//     outputOptions
-//   );
-//   const {ignoreClasses, ignoreAttributes} = options;
-//   const list = await Parse.Schema.all();
-//   const clone = structuredClone(list).filter(
-//     (c) => !ignoreClasses.includes(c.className)
-//   );
-//   const returnList = [];
-//   for (let cls of clone) {
-//     let obj = {className: cls.className};
-//     if (schemaParts.fields) {
-//       obj.fields = cls.fields;
-//       for (let atr of ignoreAttributes ?? [])
-//         if (obj.fields?.[atr]) delete obj.fields[atr];
-//     }
-//     if (schemaParts.indexes) obj.indexes = cls.indexes;
-//     if (schemaParts.classLevelPermissions)
-//       obj.classLevelPermissions = cls.classLevelPermissions;
-//     returnList.push(obj);
-//   }
-//   return returnList;
-// };
+export const getAllSchemas = async (
+  parts: schemaParts = {},
+  outputOptions: schemaOutputOptions = {}
+) => {
+  const schemaParts = Object.assign(
+    {
+      fields: true,
+      indexes: true,
+      classLevelPermissions: true,
+    },
+    parts
+  );
+  const options = Object.assign(
+    {
+      ignoreClasses: [],
+      ignoreAttributes: [],
+    },
+    outputOptions
+  );
+  const {ignoreClasses, ignoreAttributes} = options;
+  const list = await Parse.Schema.all();
+  const clone = structuredClone(list).filter(
+    (c) => !ignoreClasses.includes(c.className)
+  );
+  const returnList = [];
+  for (let cls of clone) {
+    let obj: RestSchema = {className: cls.className};
+    if (schemaParts.fields) {
+      obj.fields = cls.fields;
+      for (let atr of ignoreAttributes ?? [])
+        if (obj.fields?.[atr]) delete obj.fields[atr];
+    }
+    if (schemaParts.indexes) obj.indexes = cls.indexes;
+    if (schemaParts.classLevelPermissions)
+      obj.classLevelPermissions = cls.classLevelPermissions;
+    returnList.push(obj);
+  }
+  return returnList;
+};
 
 // /**
 //  * Manages the Parse Server schema, allowing for additions, modifications, and deletions.
