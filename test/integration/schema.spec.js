@@ -1,9 +1,14 @@
 import {describe, it} from 'mocha';
 import {expect} from 'chai';
 import Parse from 'parse/node';
-import {diffingFields, diffingIndexes, getAllSchemas} from '@Functions/schema';
+import {
+  diffingCLP,
+  diffingFields,
+  diffingIndexes,
+  getAllSchemas,
+} from '@Functions/schema';
 
-describe('Schema Management', function () {
+describe('Test Diffs', function () {
   it('test getAllSchemas output', async function () {
     const options = {
       ignoreClasses: [Parse.Role.className, 'Article', 'Project'],
@@ -106,6 +111,39 @@ describe('Schema Management', function () {
         _id_: {from: {_id: 1}, to: {_objectId: 1}},
         email_1: {from: {email: 1}, to: {email: -1}},
       },
+    });
+  });
+
+  it('test diffing of CLP', async function () {
+    const diffs = diffingCLP(
+      {
+        find: {'*': true},
+        count: {'*': true},
+        get: {'*': true},
+        create: {'*': true},
+        update: {'*': true},
+        delete: {'*': true},
+        addField: {},
+        protectedFields: {'*': []},
+      },
+      {
+        find: {requiresAuthentication: true},
+        count: {'*': true},
+        get: {'*': true},
+        create: {requiresAuthentication: true, 'role:admin': true},
+        update: {'*': true},
+        delete: {'*': true},
+        addField: {},
+        protectedFields: {'*': ['user']},
+      }
+    );
+    expect(diffs).to.deep.equal({
+      find: {from: {'*': true}, to: {requiresAuthentication: true}},
+      create: {
+        from: {'*': true},
+        to: {requiresAuthentication: true, 'role:admin': true},
+      },
+      protectedFields: {from: {'*': []}, to: {'*': ['user']}},
     });
   });
 });

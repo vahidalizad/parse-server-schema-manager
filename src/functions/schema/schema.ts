@@ -41,7 +41,13 @@ interface RestSchema {
   indexes?: Indexes;
 }
 
-export const diffingFields = (obj1: Fields, obj2: Fields) => {
+type DiffFieldsOutput = {
+  change?: ChangeFields;
+  add?: Fields;
+  remove?: Fields;
+};
+
+export const diffingFields = (obj1: Fields, obj2: Fields): DiffFieldsOutput => {
   let add: Fields = {};
   let remove: Fields = {};
   let change: ChangeFields = {};
@@ -77,34 +83,13 @@ export const diffingFields = (obj1: Fields, obj2: Fields) => {
     }
   }
   for (let key in obj1) if (!obj2[key]) remove[key] = obj1[key];
-  return {add, change, remove};
-};
 
-// const diffingObject = (obj1: Fields, obj2: Fields) => {
-//   let add: Fields = {};
-//   let remove: Fields = {};
-//   let change = {};
-//   for (let key in obj1) {
-//     if (!obj2[key]) remove[key] = obj1[key];
-//     else {
-//       //
-//       if (Object.keys(add2).length) {
-//         change[key] = change[key] || {};
-//         change[key].add = add2;
-//       }
-//       if (Object.keys(remove2).length) {
-//         change[key] = change[key] || {};
-//         change[key].remove = remove2;
-//       }
-//       if (Object.keys(change2).length) {
-//         change[key] = change[key] || {};
-//         change[key].change = change2;
-//       }
-//     }
-//   }
-//   for (let key in obj2) if (!obj1[key]) add[key] = obj2[key];
-//   return {add, remove, change};
-// };
+  const output: DiffFieldsOutput = {};
+  if (Object.keys(add).length) output.add = add;
+  if (Object.keys(remove).length) output.remove = remove;
+  if (Object.keys(change).length) output.change = change;
+  return output;
+};
 
 type ChangedIndex = {
   [key: string]: Indexes;
@@ -118,7 +103,16 @@ type AddOrRemoveIndexes = {
   [key: string]: Indexes;
 };
 
-export const diffingIndexes = (obj1: Indexes, obj2: Indexes) => {
+type DiffIndexesOutput = {
+  change?: ChangedIndexesMap;
+  add?: AddOrRemoveIndexes;
+  remove?: AddOrRemoveIndexes;
+};
+
+export const diffingIndexes = (
+  obj1: Indexes,
+  obj2: Indexes
+): DiffIndexesOutput => {
   const change: ChangedIndexesMap = {};
   const add: AddOrRemoveIndexes = {};
   const remove: AddOrRemoveIndexes = {};
@@ -142,7 +136,78 @@ export const diffingIndexes = (obj1: Indexes, obj2: Indexes) => {
       };
     }
   }
-  return {add, remove, change};
+  const output: DiffIndexesOutput = {};
+  if (Object.keys(add).length) output.add = add;
+  if (Object.keys(remove).length) output.remove = remove;
+  if (Object.keys(change).length) output.change = change;
+  return output;
+};
+
+type CLP = {
+  [key: string]: {
+    [key: string]: any;
+  };
+};
+
+type DiffClPOutput = {
+  [key: string]: CLP;
+};
+
+export const diffingCLP = (obj1: CLP, obj2: CLP): DiffClPOutput => {
+  const change: DiffClPOutput = {};
+  for (let key in obj2) {
+    const allKeys = [...Object.keys(obj1[key])];
+    if (
+      allKeys.some((key2) => !checkSame(obj1[key]?.[key2], obj2[key]?.[key2]))
+    ) {
+      change[key] = {
+        from: obj1[key],
+        to: obj2[key],
+      };
+    }
+  }
+  return change;
+};
+
+type DiffSchemaOutput = {
+  fields?: DiffFieldsOutput;
+  indexes?: DiffIndexesOutput;
+  classLevelPermissions?: DiffClPOutput;
+};
+
+export const diffingSchema = (
+  obj1: RestSchema,
+  obj2: RestSchema,
+  parts: schemaParts = {}
+): DiffSchemaOutput => {
+  const changes: DiffSchemaOutput = {};
+  const schemaParts = Object.assign(
+    {
+      fields: true,
+      indexes: true,
+      classLevelPermissions: true,
+    },
+    parts
+  );
+  if (schemaParts.fields) {
+    const diff = diffingFields(obj1.fields as Fields, obj2.fields as Fields);
+    if (Object.keys(diff).length) changes.fields = diff;
+  }
+  if (schemaParts.indexes) {
+    const diff = diffingIndexes(
+      obj1.indexes as Indexes,
+      obj2.indexes as Indexes
+    );
+    if (Object.keys(diff).length) changes.indexes = diff;
+  }
+  if (schemaParts.classLevelPermissions) {
+    const diff = diffingCLP(
+      obj1.classLevelPermissions as CLP,
+      obj2.classLevelPermissions as CLP
+    );
+    if (Object.keys(diff).length) changes.classLevelPermissions = diff;
+  }
+  return changes;
 };
 
 type schemaParts = {
@@ -204,35 +269,38 @@ export const getAllSchemas = async (
 //  * @returns {Object} An object detailing the changes made or to be made.
 //  * @see {@link https://docs.parseplatform.org/defined-schema/guide|Parse Server Schema Documentation}
 //  */
-// export const manageSchema = async (schema, {commit, remove, purge}) => {
-//   let reviewFields = {};
-//   let reviewIndexes = {};
-//   for (let key in schema) {
-//     reviewFields[key] = schema[key].fields;
-//     reviewIndexes[key] = schema[key].indexes;
-//   }
-
-//   let existingSchema = await getAllSchemas(true, true);
-//   let diff = diffingObject(existingSchema.fields, reviewFields);
-//   let indexChanges = addDiffIndexes(existingSchema.indexes, reviewIndexes);
-
-//   if (!commit) return {...diff, indexChanges, commit, log: 'Nothing happened!'};
-
-//   for (let key in schema)
-//     if (diff.add[key] || diff.change[key] || indexChanges[key])
-//       await syncSchemaWithObject(
-//         new Parse.Schema(key),
-//         schema[key].fields,
-//         schema[key].indexes
-//       );
-
-//   // remove removed classes
-//   if (remove)
-//     for (let key in diff.remove ?? {}) {
-//       const mySchema = new Parse.Schema(key);
-//       if (purge) await mySchema.purge();
-//       await mySchema.delete();
-//     }
-
-//   return {...diff, indexChanges, commit, log: 'Schema changed!'};
-// };
+type schemaManagerActions = {
+  commit: boolean;
+  remove: boolean;
+  purge: boolean;
+};
+export const manageSchema = async (
+  schema: Array<RestSchema>,
+  {commit = false, remove = false, purge = false}: schemaManagerActions
+) => {
+  //   let reviewFields = {};
+  //   let reviewIndexes = {};
+  //   for (let key in schema) {
+  //     reviewFields[key] = schema[key].fields;
+  //     reviewIndexes[key] = schema[key].indexes;
+  //   }
+  //   let existingSchema = await getAllSchemas(true, true);
+  //   let diff = diffingObject(existingSchema.fields, reviewFields);
+  //   let indexChanges = addDiffIndexes(existingSchema.indexes, reviewIndexes);
+  //   if (!commit) return {...diff, indexChanges, commit, log: 'Nothing happened!'};
+  //   for (let key in schema)
+  //     if (diff.add[key] || diff.change[key] || indexChanges[key])
+  //       await syncSchemaWithObject(
+  //         new Parse.Schema(key),
+  //         schema[key].fields,
+  //         schema[key].indexes
+  //       );
+  //   // remove removed classes
+  //   if (remove)
+  //     for (let key in diff.remove ?? {}) {
+  //       const mySchema = new Parse.Schema(key);
+  //       if (purge) await mySchema.purge();
+  //       await mySchema.delete();
+  //     }
+  //   return {...diff, indexChanges, commit, log: 'Schema changed!'};
+};
