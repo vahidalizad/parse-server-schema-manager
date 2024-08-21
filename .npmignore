@@ -1,10 +1,13 @@
+.github/
 .vscode/
 src/
 test/
 logs/
-.npmrc
+coverage/
+.nyc_output/
+eslint.config.js
+.nycrc
 .babelrc
-.eslintrc.js
+.mocharc.js
 .gitignore
-.gitlab-ci.yml
 .prettierrc
