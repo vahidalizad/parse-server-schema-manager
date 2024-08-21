@@ -1,0 +1,23 @@
+[
+  {
+    "className": "Test",
+    "fields": {
+      "ACL": {"type": "ACL"},
+      "name": {"type": "String"},
+      "age": {"type": "Number"}
+    },
+    "indexes": {
+      "_id_": {"_id": 1}
+    },
+    "classLevelPermissions": {
+      "addField": {"*": true},
+      "count": {"*": true},
+      "create": {"*": true},
+      "delete": {"*": true},
+      "find": {"*": true},
+      "get": {"*": true},
+      "protectedFields": {"*": []},
+      "update": {"*": true}
+    }
+  }
+]
