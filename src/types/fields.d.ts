@@ -6,6 +6,7 @@ type FieldType =
   | 'Pointer'
   | 'Date'
   | 'GeoPoint'
+  | 'polygon'
   | 'Relation'
   | 'Array'
   | 'Object';
@@ -19,6 +20,10 @@ export interface GenericField {
   required?: boolean;
 }
 
+export interface ParseACLField {
+  type: 'ACL';
+}
+
 export interface ParseFieldString {
   type: 'String';
   defaultValue?: string;
@@ -26,6 +31,7 @@ export interface ParseFieldString {
 
 export interface ParseFieldNumber {
   type: 'Number';
+  defaultValue: number;
 }
 
 export interface ParseFieldBoolean {
@@ -35,31 +41,43 @@ export interface ParseFieldBoolean {
 
 export interface ParseFieldFile {
   type: 'File';
+  defaultValue: Parse.File;
 }
 
 export interface ParseFieldPointer {
   type: 'Pointer';
   targetClass: string;
+  defaultValue: Parse.Object;
 }
 
 export interface ParseFieldDate {
   type: 'Date';
+  defaultValue: Date;
 }
 
 export interface ParseFieldGeoPoint {
   type: 'GeoPoint';
+  defaultValue: Parse.GeoPoint;
+}
+
+export interface ParseFieldPolygon {
+  type: 'Polygon';
+  defaultValue: Parse.Polygon;
 }
 
 export interface ParseFieldRelation {
   type: 'Relation';
+  defaultValue: Parse.Relation;
 }
 
 export interface ParseFieldArray {
   type: 'Array';
+  defaultValue: Array<any>;
 }
 
 export interface ParseFieldObject {
   type: 'Object';
+  defaultValue: Record<string, any>;
 }
 
 export type ParseField = GenericField &
@@ -70,9 +88,11 @@ export type ParseField = GenericField &
     | ParseFieldFile
     | ParseFieldPointer
     | ParseFieldGeoPoint
+    | ParseFieldPolygon
     | ParseFieldRelation
     | ParseFieldArray
     | ParseFieldObject
+    | ParseACLField
   );
 
 export interface ParseFields {
