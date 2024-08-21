@@ -4,53 +4,76 @@ type FieldType =
   | 'Boolean'
   | 'File'
   | 'Pointer'
+  | 'Date'
+  | 'GeoPoint'
+  | 'Relation'
   | 'Array'
   | 'Object';
-
-export interface globalOptions {
-  required: boolean;
-}
 
 export interface pointerOptions {
   targetClass: string;
 }
 
-// TODO: ali fix it this should be this one not the bellow one but it gives error
-// export interface ParseField {
-//   type: FieldType;
-//   targetClass?: string;
-//   defaultValue?: string;
-//   required?: boolean;
-// }
-
-export interface ParseField {
-  [key: string]: string | boolean;
+export interface GenericField {
+  defaultValue?: unknown;
+  required?: boolean;
 }
 
-export interface ParseFieldString extends ParseField {
+export interface ParseFieldString {
   type: 'String';
-  options: globalOptions & {defaultValue: string};
+  defaultValue?: string;
 }
 
-export interface ParseFieldNumber extends ParseField {
+export interface ParseFieldNumber {
   type: 'Number';
-  options: globalOptions & {defaultValue: number};
 }
 
-export interface ParseFieldBoolean extends ParseField {
+export interface ParseFieldBoolean {
   type: 'Boolean';
-  options: globalOptions & {defaultValue: boolean};
+  defaultValue?: boolean;
 }
 
-export interface ParseFieldFile extends ParseField {
+export interface ParseFieldFile {
   type: 'File';
-  options: globalOptions;
 }
 
-export interface ParseFieldPointer extends ParseField {
+export interface ParseFieldPointer {
   type: 'Pointer';
-  options: globalOptions & pointerOptions;
+  targetClass: string;
 }
+
+export interface ParseFieldDate {
+  type: 'Date';
+}
+
+export interface ParseFieldGeoPoint {
+  type: 'GeoPoint';
+}
+
+export interface ParseFieldRelation {
+  type: 'Relation';
+}
+
+export interface ParseFieldArray {
+  type: 'Array';
+}
+
+export interface ParseFieldObject {
+  type: 'Object';
+}
+
+export type ParseField = GenericField &
+  (
+    | ParseFieldString
+    | ParseFieldNumber
+    | ParseFieldBoolean
+    | ParseFieldFile
+    | ParseFieldPointer
+    | ParseFieldGeoPoint
+    | ParseFieldRelation
+    | ParseFieldArray
+    | ParseFieldObject
+  );
 
 export interface ParseFields {
   [key: string]: ParseField;

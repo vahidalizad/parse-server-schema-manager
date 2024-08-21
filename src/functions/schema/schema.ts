@@ -1,4 +1,4 @@
-import {ParseClassSchema} from '@Types/fields';
+import {ParseClassSchema, ParseField, ParseFields} from '@Types/fields';
 import {checkSame} from '../object';
 import {syncSchemaWithObject} from './sync';
 import Parse from 'parse/node';
@@ -7,13 +7,6 @@ const checkSecondProperties = ['type'];
 
 const checkOptions = ['targetClass', 'required', 'defaultValue'];
 
-type FieldOptions = {
-  [key: string]: string | boolean;
-};
-
-type Fields = {
-  [key: string]: FieldOptions;
-};
 type Indexes = {
   [key: string]: {
     [key: string]: any;
@@ -22,29 +15,46 @@ type Indexes = {
 
 type DiffFieldsOutput = {
   change?: Record<string, Array<string>>;
-  add?: Fields;
-  remove?: Fields;
+  add?: ParseFields;
+  remove?: ParseFields;
 };
 
 export const diffingFields = (
-  obj1: Fields,
-  obj2: Fields,
+  obj1: ParseFields,
+  obj2: ParseFields,
   schemaOptions: SchemaOutputOptions
 ): DiffFieldsOutput => {
-  let add: Fields = {};
-  let remove: Fields = {};
+  let add: ParseFields = {};
+  let remove: ParseFields = {};
   let change: Record<string, Array<string>> = {};
   for (let key in obj2) {
     if (schemaOptions?.ignoreAttributes?.includes(key)) continue;
+
     if (!obj1[key]) add[key] = obj2[key];
     else {
-      for (let pr of checkSecondProperties)
-        if (obj1[key]?.[pr] !== obj2[key]?.[pr]) {
-          change[key] = change[key] ?? [];
-          change[key].push(`${pr}: ${obj1[key][pr]} -> ${obj2[key][pr]}`);
+      const obj1Field = obj1[key] as Record<string, any>;
+      const obj2Field = obj2[key] as Record<string, any>;
+
+      for (const prop of checkSecondProperties) {
+        if (prop in obj1Field && prop in obj2Field) {
+          if (obj1Field?.[prop] !== obj2Field?.[prop]) {
+            change[key] = change[key] ?? [];
+            change[key].push(
+              `${prop}: ${obj1Field[prop]} -> ${obj2Field[prop]}`
+            );
+          }
         }
+      }
+
+      for (let pr of checkSecondProperties) {
+        if (obj1Field?.[pr] !== obj2Field?.[pr]) {
+          change[key] = change[key] ?? [];
+          change[key].push(`${pr}: ${obj1Field[pr]} -> ${obj2Field[pr]}`);
+        }
+      }
+
       for (let pr of checkOptions)
-        if (!checkSame(obj1[key]?.[pr], obj2[key]?.[pr])) {
+        if (!checkSame(obj1Field?.[pr], obj2Field?.[pr])) {
           if (
             pr === 'required' &&
             obj1[key]?.[pr] === false &&
@@ -59,8 +69,8 @@ export const diffingFields = (
             continue;
           change[key] = change[key] ?? [];
           change[key].push(
-            `${pr}: ${JSON.stringify(obj1[key][pr])} -> ${JSON.stringify(
-              obj2[key]?.[pr]
+            `${pr}: ${JSON.stringify(obj1Field[pr])} -> ${JSON.stringify(
+              obj2Field?.[pr]
             )}`
           );
         }
@@ -208,11 +218,13 @@ export const getAllSchemas = async (
   const clone = structuredClone(list).filter(
     (c) => !ignoreClasses.includes(c.className)
   );
+
   const returnList = [];
+
   for (let cls of clone) {
     let obj: ParseClassSchema = {className: cls.className};
     if (schemaParts.fields) {
-      obj.fields = cls.fields;
+      obj.fields = cls.fields as ParseFields;
       for (let atr of ignoreAttributes ?? [])
         if (obj.fields?.[atr]) delete obj.fields[atr];
     }
@@ -250,14 +262,10 @@ const diffSchemaChanges = (
     const existingCls = existingSchema.find(
       (c) => c.className === className
     ) as ParseClassSchema;
-    if (!existingCls) continue;
+    if (!existingCls?.fields || !cls.fields) continue;
     const diff =
       part === 'fields'
-        ? diffingFields(
-            existingCls.fields as Fields,
-            cls.fields as Fields,
-            schemaOptions
-          )
+        ? diffingFields(existingCls.fields, cls.fields, schemaOptions)
         : part === 'indexes'
         ? diffingIndexes(existingCls.indexes as Indexes, cls.indexes as Indexes)
         : diffingCLP(
@@ -320,14 +328,14 @@ type ChangesDiff = {
  * @param {SchemaManagerActions} options - Flags to control the schema management process. Defaults to {commit = false, remove = false, purge = false}
  * @param {SchemaParts} actionParts - Parts of the schema to consider for the action. Defaults to { fields: true, indexes: true, classLevelPermissions: true }.
  * @param {SchemaOutputOptions} schemaOptions - Options to control the schema output. Defaults to { ignoreClasses: ['_Session'], ignoreAttributes: ['ACL', 'password', 'authData', 'emailVerified', 'email'] }.
- * @returns {Record<string, any>} An object detailing the changes made or to be made.
+ * @returns {Promise<Record<string, any>>} An object detailing the changes made or to be made.
  */
 export const manageSchema = async (
   schema: Array<ParseClassSchema>,
   {commit = false, remove = false, purge = false}: SchemaManagerActions,
   actionParts: SchemaParts = {},
   schemaOptions: SchemaOutputOptions = {}
-) => {
+): Promise<Record<string, any>> => {
   const schemaParts = sanitizeSchemaParts(actionParts);
   const options = sanitizeSchemaOptions(schemaOptions);
 

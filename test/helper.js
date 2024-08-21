@@ -3,7 +3,7 @@ export async function createSchema(className = 'Test') {
     const schema = new Parse.Schema(className);
     schema.addString('name');
     schema.addNumber('age');
-    return schema.save;
+    return schema.save();
   } catch (error) {
     console.error('Failed to create schema:', error);
     throw error;
