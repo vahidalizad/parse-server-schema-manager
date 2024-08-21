@@ -1,7 +1,7 @@
-import {ParseClassSchema, ParseField, ParseFields} from '@Types/fields';
+import {ParseClassSchema, ParseFields} from '@Types/fields';
 import {checkSame} from '../object';
 import {syncSchemaWithObject} from './sync';
-import Parse, {RestSchema} from 'parse/node';
+import Parse from 'parse/node';
 
 const checkSecondProperties = ['type'];
 
@@ -197,7 +197,7 @@ type SchemaOutputOptions = {
 
 const wait = (t: number) => new Promise((r) => setTimeout(r, t));
 
-const getAllParseSchema = async (): Promise<Array<RestSchema>> => {
+const getAllParseSchema = async () => {
   try {
     return await Parse.Schema.all();
   } catch (e) {
@@ -206,6 +206,13 @@ const getAllParseSchema = async (): Promise<Array<RestSchema>> => {
   }
 };
 
+/**
+ * Retrieves all schemas from Parse Server, optionally filtering them based on provided parts and output options.
+ *
+ * @param {SchemaParts} [parts={}] - An object containing flags to control which parts of the schema to retrieve.
+ * @param {SchemaOutputOptions} [outputOptions={}] - An object containing options to control the output of the schema.
+ * @return {Promise<Array<ParseClassSchema>>} A promise that resolves to an array of ParseClassSchema objects representing the retrieved schemas.
+ */
 export const getAllSchemas = async (
   parts: SchemaParts = {},
   outputOptions: SchemaOutputOptions = {}

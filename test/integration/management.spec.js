@@ -11,7 +11,7 @@ const schemaOptions = {
 
 const cleanSchema = async () => {
   try {
-    await manageSchema(
+    let result = await manageSchema(
       DefaultSchema,
       {commit: true, purge: true, remove: true},
       {fields: true, indexes: true, classLevelPermissions: true},
@@ -20,13 +20,22 @@ const cleanSchema = async () => {
         ignoreAttributes: [],
       }
     );
+    console.log(result);
   } catch (error) {
     console.error('Default Schema: ', error);
   }
 };
 
+describe('Reset Schemas', function () {
+  it('test cleaning speed', async function () {
+    await cleanSchema();
+  });
+});
+
 describe('Test Manage Schema', function () {
-  this.beforeEach(async function () {
+  this.timeout(5000);
+
+  this.beforeAll(async function () {
     await cleanSchema();
   });
 
@@ -54,7 +63,6 @@ describe('Test Manage Schema', function () {
     expect(result2).to.deep.equal({
       log: 'Schema synced!',
     });
-    debugger;
   });
 
   it.skip('test diffs field of a schema class', async function () {});

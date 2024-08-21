@@ -6,7 +6,7 @@
   "scripts": {
     "build": "babel src -d dist --extensions \".ts,.js\" --copy-files",
     "make": "tsc",
-    "test": "mocha --timeout 5000",
+    "test": "mocha",
     "lint": "eslint src/index.js",
     "run:mongo": "mongodb-runner start -t replset --version 6.0 -- --port 27017",
     "stop:mongo": "mongodb-runner stop --all"
