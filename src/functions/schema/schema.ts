@@ -185,6 +185,17 @@ type SchemaOutputOptions = {
   ignoreAttributes?: Array<string>;
 };
 
+const wait = (t: number) => new Promise((r) => setTimeout(r, t));
+
+const getAllParseSchemas = async () => {
+  try {
+    return await Parse.Schema.all();
+  } catch (e) {
+    await wait(1000);
+    return getAllParseSchemas();
+  }
+};
+
 export const getAllSchemas = async (
   parts: SchemaParts = {},
   outputOptions: SchemaOutputOptions = {}
