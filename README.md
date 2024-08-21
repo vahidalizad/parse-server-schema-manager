@@ -54,19 +54,65 @@ Manages the Parse Server schema, allowing for additions, modifications, and dele
 ```javascript
 import {manageSchema} from 'parse-server-schema-manager';
 
-const PLAYLIST_SCHEMA = () => {
-  const obj = {
-    user: {type: 'Pointer', options: {targetClass: '_User'}},
-    title: {type: 'String'},
-  };
-  const indexes = {user_index: {_p_user: 1}};
-  return {Playlist: {fields: obj, indexes}};
-};
-const allSchemas = {
-  ...PLAYLIST_SCHEMA(),
-};
+const allSchema = [
+  {
+    className: 'MyClass',
+    fields: {
+      objectId: {type: 'String'},
+      createdAt: {type: 'Date'},
+      updatedAt: {type: 'Date'},
+      ACL: {type: 'ACL'},
+      someField: {type: 'String', required: true},
+      anotherField: {type: 'Number', defaultValue: 0},
+      pointerField: {type: 'Pointer', targetClass: 'AnotherClass'},
+    },
+    indexes: {
+      _id_: {_id: 1},
+    },
+    classLevelPermissions: {
+      addField: {'*': true},
+      count: {'*': true},
+      create: {'*': true},
+      delete: {'*': true},
+      find: {'*': true},
+      get: {'*': true},
+      protectedFields: {'*': []},
+      update: {'*': true},
+    },
+  },
+  {
+    className: 'AnotherClass',
+    fields: {
+      objectId: {type: 'String'},
+      createdAt: {type: 'Date'},
+      updatedAt: {type: 'Date'},
+      ACL: {type: 'ACL'},
+      /* Builtin Parse Classes e.g. (User, Role, etc.) must be referneced by a "_" before its name.*/
+      user: {type: 'Pointer', targetClass: '_User'},
+    },
+  },
+];
+
 const results = await manageSchema(allSchemas, commit, remove, purge);
 console.log(results);
+```
+
+#### Available Field Types
+
+All Parse field types are supported.
+
+```json
+"String"
+"Number"
+"Boolean"
+"Date"
+"File"
+"Pointer"
+"Relation"
+"GeoPoint"
+"Polygon"
+"Object"
+"Array"
 ```
 
 #### Return Object Structure:
