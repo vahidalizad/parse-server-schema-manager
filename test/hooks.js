@@ -66,8 +66,9 @@ const wait = (t) => new Promise((r) => setTimeout(r, t));
 const isReady = async () => {
   try {
     await Parse.Schema.all();
+    console.info('Parse Schema isReady');
   } catch (e) {
-    await wait(1000);
+    await wait(3000);
     return isReady();
   }
 };
