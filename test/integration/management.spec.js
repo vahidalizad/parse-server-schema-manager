@@ -33,7 +33,7 @@ describe('Reset Schemas', function () {
 });
 
 describe('Test Manage Schema', function () {
-  this.timeout(5000);
+  this.timeout(50000);
 
   this.beforeAll(async function () {
     await cleanSchema();

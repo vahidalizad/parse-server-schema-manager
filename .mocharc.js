@@ -18,7 +18,7 @@ module.exports = {
     'mocha-suppress-logs',
     'test/hooks.js',
   ],
-  globals: ['Parse'],
+  globals: ['Parse', 'reconfigureServer'],
   extensions: ['ts', 'tsx', 'js', 'jsx'],
   exit: true,
   // delay: true,
