@@ -2,6 +2,9 @@
   {
     "className": "Test",
     "fields": {
+      "objectId": {"type": "String"},
+      "createdAt": {"type": "Date"},
+      "updatedAt": {"type": "Date"},
       "ACL": {"type": "ACL"},
       "name": {"type": "String"},
       "age": {"type": "Number"}
