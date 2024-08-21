@@ -363,7 +363,7 @@ export const manageSchema = async (
 
     for (let key of keysToSync) {
       const cls = schema.find((t) => t.className === key);
-      await syncSchemaWithObject(new Parse.Schema(key), cls);
+      await syncSchemaWithObject(key, cls);
     }
 
     log = 'Schema synced!';
