@@ -3,8 +3,6 @@ import {TestUtils} from 'parse-server';
 import detect from 'detect-port';
 import {port, reconfigureServer} from './server';
 
-const openConnections = {};
-
 const wait = (t) => new Promise((r) => setTimeout(r, t));
 
 const isReady = async () => {
@@ -23,10 +21,8 @@ export async function mochaGlobalSetup() {
   let openPort = await detect(port);
   if (openPort === port) {
     console.log('Initiating parse server instance');
-    await reconfigureServer(openConnections);
+    await reconfigureServer();
   } else console.log('Using the running parse server.');
-
-  global.reconfigureServer = () => reconfigureServer(openConnections);
 
   Parse.initialize('dev');
   Parse.CoreManager.set('SERVER_URL', serverURL);
@@ -36,11 +32,11 @@ export async function mochaGlobalSetup() {
 }
 
 export function mochaGlobalTeardown() {
-  if (Object.keys(openConnections).length > 1) {
-    console.warn(
-      'There were open connections to the server left after the test finished'
-    );
-  }
+  // if (Object.keys(openConnections).length > 1) {
+  //   console.warn(
+  //     'There were open connections to the server left after the test finished'
+  //   );
+  // }
 }
 
 export const mochaHooks = {

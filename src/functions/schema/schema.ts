@@ -201,7 +201,6 @@ const getAllParseSchema = async () => {
   try {
     return await Parse.Schema.all();
   } catch (e) {
-    await ((global as Record<string, any>).reconfigureServer as Function)();
     await wait(1000);
     return await getAllParseSchema();
   }

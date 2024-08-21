@@ -7,8 +7,13 @@ import {
   diffingIndexes,
   getAllSchemas,
 } from '@Functions/schema';
+import {checkParseSanity} from '@test/server';
 
 describe('Test Diffs', function () {
+  this.beforeAll(async function () {
+    await checkParseSanity();
+  });
+
   it('test getAllSchemas output', async function () {
     const options = {
       ignoreClasses: [Parse.Role.className, 'Article', 'Project'],
