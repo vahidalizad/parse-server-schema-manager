@@ -3,6 +3,7 @@ import {expect} from 'chai';
 import {describe, it} from 'mocha';
 import TestSchema from '../assets/test-schema.json';
 import DefaultSchema from '../assets/default-schema.json';
+import {reconfigureServer} from '@test/server';
 
 const schemaOptions = {
   ignoreClasses: ['_Session', '_User', '_Role'],
@@ -11,7 +12,8 @@ const schemaOptions = {
 
 const cleanSchema = async () => {
   try {
-    let result = await manageSchema(
+    await reconfigureServer();
+    await manageSchema(
       DefaultSchema,
       {commit: true, purge: true, remove: true},
       {fields: true, indexes: true, classLevelPermissions: true},
@@ -20,7 +22,7 @@ const cleanSchema = async () => {
         ignoreAttributes: [],
       }
     );
-    console.log(result);
+    await reconfigureServer();
   } catch (error) {
     console.error('Default Schema: ', error);
   }
@@ -33,7 +35,7 @@ describe('Reset Schemas', function () {
 });
 
 describe('Test Manage Schema', function () {
-  this.timeout(50000);
+  this.timeout(5000);
 
   this.beforeAll(async function () {
     await cleanSchema();

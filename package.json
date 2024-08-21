@@ -9,7 +9,8 @@
     "test": "mocha",
     "lint": "eslint src/index.js",
     "run:mongo": "mongodb-runner start -t replset --version 6.0 -- --port 27017",
-    "stop:mongo": "mongodb-runner stop --all"
+    "stop:mongo": "mongodb-runner stop --all",
+    "test:ci": "npm run run:mongo && npm run test && npm run stop:mongo"
   },
   "repository": {
     "type": "git",

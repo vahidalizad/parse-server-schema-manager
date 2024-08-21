@@ -33,7 +33,7 @@ const defaultConfiguration = {
 
 let parseServer;
 
-export const reconfigureServer = async (openConnections = {}) => {
+export const reconfigureServer = async () => {
   if (parseServer) {
     await parseServer.handleShutdown();
     await new Promise((resolve) => parseServer.server.close(resolve));
@@ -46,13 +46,14 @@ export const reconfigureServer = async (openConnections = {}) => {
     console.error('Failed to initialize Parse Server');
     return reconfigureServer();
   }
-  parseServer.server.on('connection', (connection) => {
-    const key = `${connection.remoteAddress}:${connection.remotePort}`;
-    openConnections[key] = connection;
-    connection.on('close', () => {
-      delete openConnections[key];
-    });
-    connection.on('error', console.log);
-  });
+  //   parseServer.server.on('connection', (connection) => {
+  //     const key = `${connection.remoteAddress}:${connection.remotePort}`;
+  //     global.openConnections = global.openConnections || {};
+  //     openConnections[key] = connection;
+  //     connection.on('close', () => {
+  //       delete openConnections[key];
+  //     });
+  //     connection.on('error', console.log);
+  //   });
   return parseServer;
 };
