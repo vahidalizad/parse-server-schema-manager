@@ -354,7 +354,11 @@ export const manageSchema = async (
   let log = 'Nothing changed!';
   if (commit) {
     for (let key in addRemove.add ?? {})
-      await syncSchemaWithObject(key, addRemove.add?.[key]);
+      await syncSchemaWithObject(
+        key,
+        addRemove.add?.[key],
+        options.ignoreAttributes
+      );
 
     let keysToSync: Set<string> | Array<string> = new Set();
     for (let classKey in changesDiff.fields ?? {}) keysToSync.add(classKey);
@@ -363,7 +367,7 @@ export const manageSchema = async (
 
     for (let key of keysToSync) {
       const cls = schema.find((t) => t.className === key);
-      await syncSchemaWithObject(key, cls);
+      await syncSchemaWithObject(key, cls, options.ignoreAttributes);
     }
 
     log = 'Schema synced!';

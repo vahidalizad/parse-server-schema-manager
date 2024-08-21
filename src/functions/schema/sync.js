@@ -21,7 +21,11 @@ const getFieldOptions = (field) => {
   return options;
 };
 
-export const syncSchemaWithObject = async (className, schemaObject) => {
+export const syncSchemaWithObject = async (
+  className,
+  schemaObject,
+  ignoreAttributes
+) => {
   let schema = new Parse.Schema(className);
   let available = {fields: {}, indexes: {}, classLevelPermissions: {}};
   try {
@@ -30,11 +34,15 @@ export const syncSchemaWithObject = async (className, schemaObject) => {
     available = await schema.save();
   }
 
-  const fields = schemaObject.fields;
+  const fields = structuredClone(schemaObject.fields);
   const indexes = structuredClone(schemaObject.indexes);
   const CLP = schemaObject.classLevelPermissions;
 
   for (let ignore of ignoreIndexesKeys) delete indexes[ignore];
+  for (let ignore of ignoreAttributes) {
+    delete fields[ignore];
+    delete available.fields[ignore];
+  }
 
   // sync fields
   for (let key in fields)
