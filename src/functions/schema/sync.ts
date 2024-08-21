@@ -41,7 +41,8 @@ export const syncSchemaWithObject = async (
   try {
     available = await schema.get();
   } catch (e) {
-    available = schema as unknown as Parse.RestSchema;
+    await schema.save();
+    available = await schema.get();
   }
 
   const fields = structuredClone(schemaObject.fields);

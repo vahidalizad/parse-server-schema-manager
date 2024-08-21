@@ -45,6 +45,7 @@ describe('Test Diffs', function () {
     expect(list2).to.deep.equal([
       {
         className: '_User',
+        fields: {},
         classLevelPermissions: {
           addField: {'*': true},
           count: {'*': true},

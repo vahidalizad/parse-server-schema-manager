@@ -7,7 +7,7 @@ import {checkParseSanity} from '@test/server';
 
 const schemaOptions = {
   ignoreClasses: ['_Session', '_User', '_Role'],
-  ignoreAttributes: [],
+  ignoreAttributes: ['ACL'],
 };
 
 const cleanSchema = async () => {
