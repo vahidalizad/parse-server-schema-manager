@@ -1,7 +1,7 @@
 import {ParseClassSchema, ParseField, ParseFields} from '@Types/fields';
 import {checkSame} from '../object';
 import {syncSchemaWithObject} from './sync';
-import Parse from 'parse/node';
+import Parse, {RestSchema} from 'parse/node';
 
 const checkSecondProperties = ['type'];
 
@@ -197,12 +197,12 @@ type SchemaOutputOptions = {
 
 const wait = (t: number) => new Promise((r) => setTimeout(r, t));
 
-const getAllParseSchemas = async () => {
+const getAllParseSchema = async (): Promise<Array<RestSchema>> => {
   try {
     return await Parse.Schema.all();
   } catch (e) {
     await wait(1000);
-    return getAllParseSchemas();
+    return getAllParseSchema();
   }
 };
 
@@ -214,7 +214,7 @@ export const getAllSchemas = async (
   const options = sanitizeSchemaOptions(outputOptions);
 
   const {ignoreClasses, ignoreAttributes} = options;
-  const list = await Parse.Schema.all();
+  const list = await getAllParseSchema();
   const clone = structuredClone(list).filter(
     (c) => !ignoreClasses.includes(c.className)
   );
