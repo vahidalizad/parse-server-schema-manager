@@ -11,7 +11,8 @@
         "alias": {
           "@Functions": "./src/functions",
           "@Constants": "./src/constants",
-          "@Types": "./src/types"
+          "@Types": "./src/types",
+          "@test": "./test"
         }
       }
     ]
