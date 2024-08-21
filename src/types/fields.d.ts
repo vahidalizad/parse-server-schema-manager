@@ -15,7 +15,7 @@ export interface pointerOptions {
 }
 
 export interface GenericField {
-  defaultValue?: unknown;
+  defaultValue?: string | boolean | number | [] | {} | Date;
   required?: boolean;
 }
 
