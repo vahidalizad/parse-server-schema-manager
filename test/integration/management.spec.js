@@ -3,7 +3,7 @@ import {expect} from 'chai';
 import {describe, it} from 'mocha';
 import TestSchema from '../assets/test-schema.json';
 import DefaultSchema from '../assets/default-schema.json';
-import {reconfigureServer} from '@test/server';
+import {checkParseSanity} from '@test/server';
 
 const schemaOptions = {
   ignoreClasses: ['_Session', '_User', '_Role'],
@@ -12,7 +12,7 @@ const schemaOptions = {
 
 const cleanSchema = async () => {
   try {
-    await reconfigureServer();
+    await checkParseSanity();
     await manageSchema(
       DefaultSchema,
       {commit: true, purge: true, remove: true},
@@ -22,7 +22,7 @@ const cleanSchema = async () => {
         ignoreAttributes: [],
       }
     );
-    await reconfigureServer();
+    await checkParseSanity();
   } catch (error) {
     console.error('Default Schema: ', error);
   }

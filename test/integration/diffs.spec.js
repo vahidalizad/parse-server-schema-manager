@@ -7,11 +7,11 @@ import {
   diffingIndexes,
   getAllSchemas,
 } from '@Functions/schema';
-import {reconfigureServer} from '@test/server';
+import {checkParseSanity} from '@test/server';
 
 describe('Test Diffs', function () {
   this.beforeAll(async function () {
-    await reconfigureServer();
+    await checkParseSanity();
   });
 
   it('test getAllSchemas output', async function () {
