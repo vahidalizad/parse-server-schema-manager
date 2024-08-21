@@ -6,7 +6,8 @@
     "paths": {
       "@Constants/*": ["src/constants/*"],
       "@Functions/*": ["src/functions/*"],
-      "@Types/*": ["src/types/*"]
+      "@Types/*": ["src/types/*"],
+      "@test/*": ["test/*"]
     }
   }
 }
