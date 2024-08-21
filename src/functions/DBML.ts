@@ -23,7 +23,7 @@ const colors = {
   blueGrey: '#455a64',
 };
 
-const colorByIndex = (id) => {
+const colorByIndex = (id: number) => {
   const colorsArray = Object.values(colors);
   const index = id % colorsArray.length;
   return colorsArray[index];
@@ -31,12 +31,13 @@ const colorByIndex = (id) => {
 
 /**
  * Creates a DBML (Database Markup Language) file from Parse Server schemas.
- * @param {Object} additionalPointers - Additional pointer relationships to include in the DBML file.
+ *
+ * @param {Record<string, Record<string, string>>} additionalPointers - Additional pointer relationships to include in the DBML file.
  * @param {string} filename - The name of the output DBML file.
  * @returns {Promise<void>}
  */
 export const createDBMLFile = async (
-  additional = {},
+  additional: Record<string, Record<string, string>> = {},
   schemaDBML = '_SCHEMA.dbml'
 ) => {
   let DBML = [];
@@ -53,7 +54,7 @@ export const createDBMLFile = async (
       (key) => !['_id', 'objectId', 'updatedAt', 'createdAt'].includes(key)
     );
 
-    const color = colorByIndex(classIndex);
+    const color = colorByIndex(Number(classIndex));
 
     let TABLE = `Table ${className} [headercolor: ${color}] {
     objectId String
@@ -75,7 +76,7 @@ export const createDBMLFile = async (
       indexes.push(`      ${first} ${second}`);
     }
 
-    const dbmlOptions = {};
+    const dbmlOptions: Record<string, Array<any> | string> = {};
 
     for (let fieldName of fields) {
       let field = parseClass.fields[fieldName];
