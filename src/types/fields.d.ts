@@ -87,7 +87,7 @@ type Indexes = {
 
 export interface ParseClassSchema {
   className: string;
-  fields?: ParseFields;
+  fields: ParseFields;
   classLevelPermissions?: Parse.Schema.CLP;
   indexes?: Indexes;
 }

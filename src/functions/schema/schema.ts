@@ -230,7 +230,7 @@ export const getAllSchemas = async (
   const returnList = [];
 
   for (let cls of clone) {
-    let obj: ParseClassSchema = {className: cls.className};
+    let obj: ParseClassSchema = {className: cls.className, fields: {}};
     if (schemaParts.fields) {
       obj.fields = cls.fields as ParseFields;
       for (let atr of ignoreAttributes ?? [])
