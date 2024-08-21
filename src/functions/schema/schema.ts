@@ -292,15 +292,6 @@ const addRemoveSchemaChanges = (
   return output;
 };
 
-// /**
-//  * Manages the Parse Server schema, allowing for additions, modifications, and deletions.
-//  * @param {Object} allSchemas - An object containing all schema definitions.
-//  * @param {boolean} options - Flag to apply changes to the database. If false, only shows differences.
-//  * @param {boolean} remove - Flag to allow removal of columns and tables.
-//  * @param {boolean} purge - Flag to allow purging of non-empty tables before removal.
-//  * @returns {Object} An object detailing the changes made or to be made.
-//  * @see {@link https://docs.parseplatform.org/defined-schema/guide|Parse Server Schema Documentation}
-//  */
 type SchemaManagerActions = {
   commit: boolean;
   remove: boolean;
@@ -311,6 +302,15 @@ type ChangesDiff = {
   indexes?: ChangeSchema;
   classLevelPermissions?: ChangeSchema;
 };
+/**
+ * Manages the Parse Server schema, allowing for additions, modifications, and deletions.
+ *
+ * @param {Array<ParseClassSchema>} schema - An object containing all schema definitions.
+ * @param {SchemaManagerActions} options - Flags to control the schema management process. Defaults to {commit = false, remove = false, purge = false}
+ * @param {SchemaParts} actionParts - Parts of the schema to consider for the action. Defaults to { fields: true, indexes: true, classLevelPermissions: true }.
+ * @param {SchemaOutputOptions} schemaOptions - Options to control the schema output. Defaults to { ignoreClasses: ['_Session'], ignoreAttributes: ['ACL', 'password', 'authData', 'emailVerified', 'email'] }.
+ * @returns {Record<string, any>} An object detailing the changes made or to be made.
+ */
 export const manageSchema = async (
   schema: Array<ParseClassSchema>,
   {commit = false, remove = false, purge = false}: SchemaManagerActions,
