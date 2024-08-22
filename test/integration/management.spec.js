@@ -4,11 +4,14 @@ import {describe, it} from 'mocha';
 import TestSchema from '../assets/test-schema.json';
 import DefaultSchema from '../assets/default-schema.json';
 import {checkParseSanity} from '@test/server';
+import {saveToDatabase} from '@test/helper';
 
 const schemaOptions = {
   ignoreClasses: ['_Session', '_User', '_Role'],
   ignoreAttributes: ['ACL'],
 };
+const schemaObject = TestSchema[0];
+const actionParts = {fields: true};
 
 const cleanSchema = async () => {
   try {
@@ -49,7 +52,7 @@ describe('Test Manage Schema', function () {
     const result = await manageSchema(
       TestSchema,
       {commit: true},
-      {fields: true},
+      actionParts,
       schemaOptions
     );
     expect(result).to.deep.equal({
@@ -59,7 +62,7 @@ describe('Test Manage Schema', function () {
     const result2 = await manageSchema(
       TestSchema,
       {commit: true},
-      {fields: true},
+      actionParts,
       schemaOptions
     );
     expect(result2).to.deep.equal({
@@ -67,21 +70,203 @@ describe('Test Manage Schema', function () {
     });
   });
 
-  it.skip('test diffs field of a schema class', async function () {});
+  it('test not add exist field to schema class with commit true', async function () {
+    const modifiedSchema = {
+      ...schemaObject,
+      fields: {
+        ...schemaObject.fields,
+        name: {type: 'String'},
+      },
+    };
+    const result = await manageSchema(
+      [modifiedSchema],
+      {commit: true},
+      actionParts,
+      schemaOptions
+    );
+    const resultSchema = {[schemaObject.className]: schemaObject};
+    expect(result).to.deep.equal({
+      add: resultSchema,
+      log: 'Schema synced!',
+    });
+  });
 
-  it.skip('test add field to schema class', async function () {});
+  it('test not add field to schema class with commit false', async function () {
+    const newSchema = {
+      ...schemaObject,
+      fields: {...schemaObject.fields, email: {type: 'String'}},
+    };
+    const result = await manageSchema(
+      [newSchema],
+      {commit: false},
+      actionParts,
+      schemaOptions
+    );
+    const resultSchema = {[newSchema.className]: newSchema};
+    expect(result).to.deep.equal({
+      add: resultSchema,
+      log: 'Nothing changed!',
+    });
+  });
 
-  it.skip('test not add exist field to schema class with commit true', async function () {});
+  it('test change field type in field class', async function () {
+    const modifiedSchema = {
+      ...schemaObject,
+      fields: {
+        ...schemaObject.fields,
+        name: {type: 'Number'},
+      },
+    };
+    const result = await manageSchema(
+      [modifiedSchema],
+      {commit: true},
+      actionParts,
+      schemaOptions
+    );
+    const resultSchema = {[modifiedSchema.className]: modifiedSchema};
+    expect(result).to.deep.equal({
+      add: resultSchema,
+      log: 'Schema synced!',
+    });
+  });
 
-  it.skip('test not add field to schema class with commit false', async function () {});
+  it('test remove empty field in class with only remove', async function () {
+    const newSchema = {
+      ...schemaObject,
+      fields: {...schemaObject.fields, email: {type: 'String'}},
+    };
 
-  it.skip('test change field type in field class', async function () {});
+    await manageSchema([newSchema], {commit: true}, actionParts, schemaOptions);
 
-  it.skip('test remove empty field in class with only remove', async function () {});
+    const modifiedSchema = structuredClone(newSchema);
+    delete modifiedSchema.fields.email;
 
-  it.skip('test remove field in class', async function () {});
+    const result = await manageSchema(
+      [modifiedSchema],
+      {commit: true, remove: true},
+      actionParts,
+      schemaOptions
+    );
+    const resultObject = {
+      fields: {
+        Test: {
+          remove: {
+            email: {
+              type: 'String',
+            },
+          },
+        },
+      },
+    };
+    expect(result).to.deep.equal({
+      changes: resultObject,
+      log: 'Schema synced!',
+    });
+  });
 
-  it.skip('test not to remove empty field in class with remove false', async function () {});
+  it('test remove field in class', async function () {
+    const newSchema = {
+      ...schemaObject,
+      fields: {...schemaObject.fields, email: {type: 'String'}},
+    };
 
-  it.skip('test not to remove field in class with purge false', async function () {});
+    await manageSchema([newSchema], {commit: true}, actionParts, schemaOptions);
+
+    const modifiedSchema = structuredClone(newSchema);
+    delete modifiedSchema.fields.email;
+
+    const result = await manageSchema(
+      [modifiedSchema],
+      {commit: true, remove: true, purge: true},
+      actionParts,
+      schemaOptions
+    );
+    const resultObject = {
+      fields: {
+        Test: {
+          remove: {
+            email: {
+              type: 'String',
+            },
+          },
+        },
+      },
+    };
+    expect(result).to.deep.equal({
+      changes: resultObject,
+      log: 'Schema synced!',
+    });
+  });
+
+  it('test not to remove empty field in class with remove false', async function () {
+    const newSchema = {
+      ...schemaObject,
+      fields: {...schemaObject.fields, email: {type: 'String'}},
+    };
+
+    await manageSchema([newSchema], {commit: true}, actionParts, schemaOptions);
+
+    const modifiedSchema = structuredClone(newSchema);
+    delete modifiedSchema.fields.email;
+
+    const result = await manageSchema(
+      [modifiedSchema],
+      {commit: true, remove: false},
+      actionParts,
+      schemaOptions
+    );
+    const resultObject = {
+      fields: {
+        Test: {
+          remove: {
+            email: {
+              type: 'String',
+            },
+          },
+        },
+      },
+    };
+    expect(result).to.deep.equal({
+      changes: resultObject,
+      log: 'Nothing changed!',
+    });
+  });
+
+  it('test not to remove field in class with purge false', async function () {
+    const newSchema = {
+      ...schemaObject,
+      fields: {...schemaObject.fields, email: {type: 'String'}},
+    };
+
+    await manageSchema([newSchema], {commit: true}, actionParts, schemaOptions);
+
+    await saveToDatabase({className: newSchema.className});
+
+    const modifiedSchema = structuredClone(newSchema);
+    delete modifiedSchema.fields.email;
+
+    const result = await manageSchema(
+      [modifiedSchema],
+      {commit: true, remove: true},
+      actionParts,
+      schemaOptions
+    );
+
+    const resultObject = {
+      fields: {
+        Test: {
+          remove: {
+            email: {
+              type: 'String',
+            },
+          },
+        },
+      },
+    };
+
+    expect(result).to.deep.equal({
+      changes: resultObject,
+      log: 'Nothing changed!',
+    });
+  });
 });
