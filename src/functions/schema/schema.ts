@@ -319,9 +319,9 @@ const addRemoveSchemaChanges = (
 };
 
 type SchemaManagerActions = {
-  commit: boolean;
-  remove: boolean;
-  purge: boolean;
+  commit?: boolean;
+  remove?: boolean;
+  purge?: boolean;
 };
 type ChangesDiff = {
   fields?: ChangeSchema;

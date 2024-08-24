@@ -2,7 +2,6 @@
   {
     "className": "_User",
     "fields": {
-      "ACL": {"type": "ACL"},
       "createdAt": {"type": "Date"},
       "email": {"type": "String"},
       "emailVerified": {"type": "Boolean"},
@@ -26,8 +25,8 @@
       "delete": {"*": true},
       "find": {"*": true},
       "get": {"*": true},
-      "protectedFields": {"*": []},
-      "update": {"*": true}
+      "update": {"*": true},
+      "protectedFields": {"*": []}
     }
   },
   {
@@ -36,7 +35,6 @@
       "objectId": {"type": "String"},
       "createdAt": {"type": "Date"},
       "updatedAt": {"type": "Date"},
-      "ACL": {"type": "ACL"},
       "name": {"type": "String"},
       "users": {"type": "Relation", "targetClass": "_User"},
       "roles": {"type": "Relation", "targetClass": "_Role"}

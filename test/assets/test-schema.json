@@ -5,7 +5,6 @@
       "objectId": {"type": "String"},
       "createdAt": {"type": "Date"},
       "updatedAt": {"type": "Date"},
-      "ACL": {"type": "ACL"},
       "name": {"type": "String"},
       "age": {"type": "Number"}
     },
@@ -19,8 +18,8 @@
       "delete": {"*": true},
       "find": {"*": true},
       "get": {"*": true},
-      "protectedFields": {"*": []},
-      "update": {"*": true}
+      "update": {"*": true},
+      "protectedFields": {"*": []}
     }
   }
 ]

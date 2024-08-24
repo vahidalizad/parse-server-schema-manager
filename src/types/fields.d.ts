@@ -1,99 +1,71 @@
-type FieldType =
-  | 'String'
-  | 'Number'
-  | 'Boolean'
-  | 'File'
-  | 'Pointer'
-  | 'Date'
-  | 'GeoPoint'
-  | 'polygon'
-  | 'Relation'
-  | 'Array'
-  | 'Object';
+import {JSONValue} from './values';
 
 export interface pointerOptions {
   targetClass: string;
 }
 
-export interface GenericField {
-  defaultValue?: string | boolean | number | [] | {} | Date;
+export interface GenericField<T> {
+  defaultValue?: T;
   required?: boolean;
 }
 
-export interface ParseACLField {
-  type: 'ACL';
-}
-
-export interface ParseFieldString {
+export interface ParseFieldString extends GenericField<string> {
   type: 'String';
-  defaultValue?: string;
 }
 
-export interface ParseFieldNumber {
+export interface ParseFieldNumber extends GenericField<number> {
   type: 'Number';
-  defaultValue: number;
 }
 
-export interface ParseFieldBoolean {
+export interface ParseFieldBoolean extends GenericField<boolean> {
   type: 'Boolean';
-  defaultValue?: boolean;
 }
 
-export interface ParseFieldFile {
+export interface ParseFieldFile extends GenericField<Parse.File> {
   type: 'File';
-  defaultValue: Parse.File;
 }
 
-export interface ParseFieldPointer {
+export interface ParseFieldPointer
+  extends GenericField<Parse.Pointer | Parse.Object> {
   type: 'Pointer';
   targetClass: string;
-  defaultValue: Parse.Object;
 }
 
-export interface ParseFieldDate {
+export interface ParseFieldDate extends GenericField<Date> {
   type: 'Date';
-  defaultValue: Date;
 }
 
-export interface ParseFieldGeoPoint {
+export interface ParseFieldGeoPoint extends GenericField<Parse.GeoPoint> {
   type: 'GeoPoint';
-  defaultValue: Parse.GeoPoint;
 }
 
-export interface ParseFieldPolygon {
+export interface ParseFieldPolygon extends GenericField<Parse.Polygon> {
   type: 'Polygon';
-  defaultValue: Parse.Polygon;
 }
 
-export interface ParseFieldRelation {
+export interface ParseFieldRelation extends GenericField<Parse.Relation> {
   type: 'Relation';
-  defaultValue: Parse.Relation;
 }
 
-export interface ParseFieldArray {
+export interface ParseFieldArray extends GenericField<Array<any>> {
   type: 'Array';
-  defaultValue: Array<any>;
 }
 
-export interface ParseFieldObject {
+export interface ParseFieldObject extends GenericField<JSONValue> {
   type: 'Object';
-  defaultValue: Record<string, any>;
 }
 
-export type ParseField = GenericField &
-  (
-    | ParseFieldString
-    | ParseFieldNumber
-    | ParseFieldBoolean
-    | ParseFieldFile
-    | ParseFieldPointer
-    | ParseFieldGeoPoint
-    | ParseFieldPolygon
-    | ParseFieldRelation
-    | ParseFieldArray
-    | ParseFieldObject
-    | ParseACLField
-  );
+export type ParseField =
+  | ParseFieldString
+  | ParseFieldNumber
+  | ParseFieldBoolean
+  | ParseFieldFile
+  | ParseFieldPointer
+  | ParseFieldGeoPoint
+  | ParseFieldPolygon
+  | ParseFieldRelation
+  | ParseFieldArray
+  | ParseFieldObject;
 
 export interface ParseFields {
   [key: string]: ParseField;
@@ -101,13 +73,13 @@ export interface ParseFields {
 
 type Indexes = {
   [key: string]: {
-    [key: string]: any;
+    [key: string]: number;
   };
 };
 
 export interface ParseClassSchema {
   className: string;
-  fields: ParseFields;
+  fields: Record<string, ParseField>;
   classLevelPermissions?: Parse.Schema.CLP;
   indexes?: Indexes;
 }
