@@ -5,9 +5,12 @@ test/
 logs/
 coverage/
 .nyc_output/
+example/
 eslint.config.js
 .nycrc
 .babelrc
 .mocharc.js
 .gitignore
 .prettierrc
+tsconfig.json
+CONTRIBUTION.md
