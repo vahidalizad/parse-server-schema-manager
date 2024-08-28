@@ -1,4 +1,4 @@
-# parse-server-schema-manager
+# Parse Server Schema Manager
 
 Parse Server Schema Manager is an npm package that implements "schema as code" for Parse Server. It allows developers to manage database schemas and Class Level Permissions (CLP) through code, offering improved control and synchronization between your codebase and database schema.
 
@@ -9,32 +9,30 @@ Parse Server Schema Manager is an npm package that implements "schema as code" f
 - **Selective Commit System**: Apply schema changes by setting `commit: true` in the `manageSchema` or `manageCLP` functions.
 - **Detailed Change Logging**: Get comprehensive information about changes in your schema or CLP.
 
-## Why Use parse-server-schema-manager?
+## Why Use Parse Server Schema Manager?
 
 1. **Version Control**: Track schema changes over time using your preferred version control system.
 2. **Flexibility**: Decide when to apply changes, allowing for careful consideration before committing to database modifications.
 3. **Transparency**: Clearly see what changes are being made to your schema and CLPs, reducing the risk of unintended modifications.
 4. **Developer Experience**: Simplify the process of managing Parse Server schemas, allowing developers to focus on building features.
 
-## Install
+## Installation
 
-Install via **npm**
+You can install Parse Server Schema Manager using npm or yarn:
 
 ```shell
+# Install via npm
 npm install parse-server-schema-manager
-```
 
-Install via **yarn**
-
-```shell
+# Install via yarn
 yarn add parse-server-schema-manager
 ```
 
 ## API Reference
 
-The parse-server-schema-manager package provides three main functions to manage your Parse Server schema:
+The Parse Server Schema Manager package provides three main functions to manage your Parse Server schema:
 
-### 1. manageSchema(allSchemas, commit, remove, purge)
+### 1. `manageSchema(allSchemas, commit, remove, purge)`
 
 Manages the Parse Server schema, allowing for additions, modifications, and deletions. This function compares the provided schema definitions with the current database schema and can apply the differences.
 
