@@ -1,10 +1,10 @@
 import {manageSchema} from '@Functions/schema';
+import {saveToDatabase} from '@test/helper';
+import {checkParseSanity} from '@test/server';
 import {expect} from 'chai';
 import {describe, it} from 'mocha';
-import TestSchema from '../assets/test-schema.json';
 import DefaultSchema from '../assets/default-schema.json';
-import {checkParseSanity} from '@test/server';
-import {saveToDatabase} from '@test/helper';
+import TestSchema from '../assets/test-schema.json';
 
 const schemaOptions = {
   ignoreClasses: ['_Session', '_User', '_Role'],
@@ -40,11 +40,15 @@ describe('Reset Schemas', function () {
 describe('Test Manage Schema', function () {
   this.timeout(5000);
 
-  this.beforeAll(async function () {
-    await cleanSchema();
-  });
+  // this.beforeEach(async function () {
+  //   await checkParseSanity();
+  // });
 
-  this.afterAll(async function () {
+  // this.afterAll(async function () {
+  //   await cleanSchema();
+  // });
+
+  this.afterEach(async function () {
     await cleanSchema();
   });
 
@@ -60,12 +64,13 @@ describe('Test Manage Schema', function () {
       log: 'Schema synced!',
     });
     const result2 = await manageSchema(
-      TestSchema,
-      {commit: true},
+      DefaultSchema,
+      {commit: true, remove: true},
       actionParts,
       schemaOptions
     );
     expect(result2).to.deep.equal({
+      remove: {Test: TestSchema[0]},
       log: 'Schema synced!',
     });
   });
@@ -206,11 +211,8 @@ describe('Test Manage Schema', function () {
 
     await manageSchema([newSchema], {commit: true}, actionParts, schemaOptions);
 
-    const modifiedSchema = structuredClone(newSchema);
-    delete modifiedSchema.fields.email;
-
     const result = await manageSchema(
-      [modifiedSchema],
+      [schemaObject],
       {commit: true, remove: false},
       actionParts,
       schemaOptions
@@ -228,7 +230,7 @@ describe('Test Manage Schema', function () {
     };
     expect(result).to.deep.equal({
       changes: resultObject,
-      log: 'Nothing changed!',
+      log: 'Schema synced!',
     });
   });
 
@@ -266,7 +268,7 @@ describe('Test Manage Schema', function () {
 
     expect(result).to.deep.equal({
       changes: resultObject,
-      log: 'Nothing changed!',
+      log: 'Schema synced!',
     });
   });
 });

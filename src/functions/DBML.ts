@@ -76,39 +76,37 @@ export const createDBMLFile = async (
       indexes.push(`      ${first} ${second}`);
     }
 
-    const dbmlOptions: Record<string, Array<any> | string> = {};
+    const dbmlOptions: Record<string, string> = {};
 
     for (let fieldName of fields) {
       let field = parseClass.fields[fieldName];
       const fieldType = field.type;
 
-      dbmlOptions[fieldName] = [];
+      const messages: string[] = [];
 
       if (additional?.[className]?.[fieldName])
-        dbmlOptions[fieldName].push(additional[className][fieldName]);
+        messages.push(additional[className][fieldName]);
 
       if (field.defaultValue !== undefined)
-        dbmlOptions[fieldName].push(
-          `default: \`${JSON.stringify(field.defaultValue)}\``
-        );
+        messages.push(`default: \`${JSON.stringify(field.defaultValue)}\``);
 
       const notes = [];
       if (field.required) notes.push('required');
 
       if (fieldType === 'Pointer') {
         pointerFields.push(fieldName);
-        dbmlOptions[fieldName].push(`ref: > ${field.targetClass}.objectId`);
+        messages.push(`ref: > ${field.targetClass}.objectId`);
         notes.push('MANY-to-ONE');
       } else if (fieldType === 'Relation') {
         relationFields.push(fieldName);
-        dbmlOptions[fieldName].push(`ref: - ${field.targetClass}.objectId`);
+        messages.push(`ref: - ${field.targetClass}.objectId`);
         notes.push('MANY-to-MANY');
       } else scalarFields.push(fieldName);
 
-      dbmlOptions[fieldName].push(`note: '${notes.join(', ')}'`);
+      messages.push(`note: '${notes.join(', ')}'`);
 
       const dbmlOptionsAsString = dbmlOptions[fieldName].length
-        ? `[${dbmlOptions[fieldName].join(', ')}]`
+        ? `[${messages.join(', ')}]`
         : '';
       dbmlOptions[fieldName] = dbmlOptionsAsString;
     }
