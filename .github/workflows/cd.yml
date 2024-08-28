@@ -29,12 +29,12 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
       - name: Use Node.js
         uses: actions/setup-node@v2
         with:
           node-version: '20'
+      - name: Setup pnpm
+        run: npm install -g pnpm
       - run: pnpm install
       - run: pnpm run make
       - run: npm publish
