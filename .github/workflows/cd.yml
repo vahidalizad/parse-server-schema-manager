@@ -18,10 +18,10 @@ jobs:
         run: npm install -g pnpm
       - run: pnpm install
       - run: pnpm run ci
-      - uses: actions/upload-artifact@v2
+      - uses: codecov/codecov-action@v4
         with:
-          name: coverage
-          path: coverage
+          fail_ci_if_error: false
+          token: ${{ secrets.CODECOV_TOKEN }}
 
   deploy:
     needs: test
