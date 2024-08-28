@@ -1,5 +1,5 @@
 [![CI/CD](https://github.com/vahidalizad/parse-server-schema-manager/actions/workflows/cd.yml/badge.svg)](https://github.com/vahidalizad/parse-server-schema-manager/actions/workflows/cd.yml)
-[![Coverage Status](https://coveralls.io/repos/github/vahidalizad/parse-server-schema-manager/badge.svg?branch=main)](https://coveralls.io/github/vahidalizad/parse-server-schema-manager?branch=main)
+[![codecov](https://codecov.io/gh/vahidalizad/parse-server-schema-manager/branch/main/graph/badge.svg)](https://codecov.io/gh/vahidalizad/parse-server-schema-manager)
 [![npm version](https://badge.fury.io/js/parse-server-schema-manager.svg)](https://www.npmjs.com/package/parse-server-schema-manager)
 
 # Parse Server Schema Manager
