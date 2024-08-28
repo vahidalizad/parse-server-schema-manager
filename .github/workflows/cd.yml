@@ -1,4 +1,4 @@
-name: CD
+name: CI/CD
 
 on:
   push:
@@ -49,15 +49,15 @@ jobs:
       - name: Post-publish cleanup
         run: rm ~/.npmrc
 
-      - name: Get version from package.json
-        run: echo "VERSION=$(node -p require\(\"./package.json\"\).version)" >> $GITHUB_ENV
+      # - name: Get version from package.json
+      #   run: echo "VERSION=$(node -p require\(\"./package.json\"\).version)" >> $GITHUB_ENV
 
-      - name: Create GitHub Release
-        uses: actions/create-release@v1
-        with:
-          tag_name: v${{ env.VERSION }}
-          release_name: Release v${{ env.VERSION }}
-          draft: false
-          prerelease: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # - name: Create GitHub Release
+      #   uses: actions/create-release@v1
+      #   with:
+      #     tag_name: v${{ env.VERSION }}
+      #     release_name: Release v${{ env.VERSION }}
+      #     draft: false
+      #     prerelease: false
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
