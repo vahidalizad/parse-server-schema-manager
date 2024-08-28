@@ -1,6 +1,6 @@
 {
   "name": "parse-server-schema-manager",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "Parse server schema manager",
   "main": "index.js",
   "scripts": {
@@ -20,6 +20,15 @@
   },
   "author": "Vahid Alizad",
   "license": "ISC",
+  "keywords": [
+    "parse-server",
+    "javascript",
+    "backend",
+    "CLP",
+    "DBML",
+    "schema",
+    "schema-as-code"
+  ],
   "homepage": "https://github.com/vahidalizad/parse-server-schema-manager",
   "devDependencies": {
     "@babel/cli": "^7.24.8",
