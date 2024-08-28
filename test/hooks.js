@@ -10,34 +10,11 @@ const isReady = async () => {
     await Parse.Schema.all();
     console.info('Parse Schema isReady');
   } catch (e) {
+    await reconfigureServer();
     await wait(3000);
     return isReady();
   }
 };
-
-// export async function mochaGlobalSetup() {
-//   process.env.TESTING = true;
-
-//   let openPort = await detect(port);
-//   if (openPort === port) {
-//     console.log('Initiating parse server instance');
-//     await reconfigureServer();
-//   } else console.log('Using the running parse server.');
-
-//   Parse.initialize('dev');
-//   Parse.CoreManager.set('SERVER_URL', serverURL);
-//   Parse.CoreManager.set('MASTER_KEY', 'devdevdev');
-
-//   await isReady();
-// }
-
-// export function mochaGlobalTeardown() {
-//   // if (Object.keys(openConnections).length > 1) {
-//   //   console.warn(
-//   //     'There were open connections to the server left after the test finished'
-//   //   );
-//   // }
-// }
 
 export const mochaHooks = {
   async beforeAll() {
@@ -49,10 +26,10 @@ export const mochaHooks = {
       await reconfigureServer();
     } else console.log('Using the running parse server.');
 
-    Parse.initialize('dev', 'devdev', 'devdevdev');
+    Parse.initialize('dev');
     Parse.serverURL = serverURL;
-    // Parse.CoreManager.set('SERVER_URL', serverURL);
-    // Parse.CoreManager.set('MASTER_KEY', 'devdevdev');
+    Parse.CoreManager.set('SERVER_URL', serverURL);
+    Parse.CoreManager.set('MASTER_KEY', 'devdevdev');
 
     await isReady();
   },

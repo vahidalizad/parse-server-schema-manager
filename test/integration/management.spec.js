@@ -1,6 +1,5 @@
 import {manageSchema} from '@Functions/schema';
 import {saveToDatabase} from '@test/helper';
-import {checkParseSanity} from '@test/server';
 import {expect} from 'chai';
 import {describe, it} from 'mocha';
 import DefaultSchema from '../assets/default-schema.json';
@@ -15,7 +14,6 @@ const actionParts = {fields: true};
 
 const cleanSchema = async () => {
   try {
-    await checkParseSanity();
     await manageSchema(
       DefaultSchema,
       {commit: true, purge: true, remove: true},
@@ -25,7 +23,6 @@ const cleanSchema = async () => {
         ignoreAttributes: [],
       }
     );
-    await checkParseSanity();
   } catch (error) {
     console.error('Default Schema: ', error);
   }
@@ -39,14 +36,6 @@ describe('Reset Schemas', function () {
 
 describe('Test Manage Schema', function () {
   this.timeout(5000);
-
-  // this.beforeEach(async function () {
-  //   await checkParseSanity();
-  // });
-
-  // this.afterAll(async function () {
-  //   await cleanSchema();
-  // });
 
   this.afterEach(async function () {
     await cleanSchema();
