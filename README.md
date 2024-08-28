@@ -1,3 +1,7 @@
+[![CI/CD](https://github.com/vahidalizad/parse-server-schema-manager/actions/workflows/cd.yml/badge.svg)](https://github.com/vahidalizad/parse-server-schema-manager/actions/workflows/cd.yml)
+[![Coverage Status](https://coveralls.io/repos/github/vahidalizad/parse-server-schema-manager/badge.svg?branch=main)](https://coveralls.io/github/vahidalizad/parse-server-schema-manager?branch=main)
+[![npm version](https://badge.fury.io/js/parse-server-schema-manager.svg)](https://www.npmjs.com/package/parse-server-schema-manager)
+
 # Parse Server Schema Manager
 
 Parse Server Schema Manager is an npm package that implements "schema as code" for Parse Server. It allows developers to manage database schemas and Class Level Permissions (CLP) through code, offering improved control and synchronization between your codebase and database schema.
@@ -38,25 +42,10 @@ Manages the Parse Server schema, allowing for additions, modifications, and dele
 
 #### Parameters:
 
-schema: Array<ParseClassSchema>,
-{commit = false, remove = false, purge = false}: SchemaManagerActions,
-actionParts: SchemaParts = {},
-schemaOptions: SchemaOutputOptions = {}
-
-type SchemaParts = {
-fields?: boolean;
-indexes?: boolean;
-classLevelPermissions?: boolean;
-};
-type SchemaOutputOptions = {
-ignoreClasses?: Array<string>;
-ignoreAttributes?: Array<string>;
-};
-
-- `schema` (Array): An array od Parse Schema class
-- `schema Actions` (Object): an object containing commit,remove,purge
-- `Action Parts` (Object): an object that define which part will the changes happen containing fields,indexes,classLevelPermissions
-- `Schema Options` (Object): an object containing two key ignoreClasses and ignoreAttributes which each is an array includes the name of a classname or name of a class attribute
+- `schema` (Array): An array of Parse Schema Class Objects
+- `schema Actions` (Object): an object that defines which actions should be performed on the database. `{commit: boolean, remove: boolean, purge: boolean}`
+- `Action Parts` (Object): an object that define which parts will change. `{fields: boolean, indexes:boolean, classLevelPermissions: boolean}`
+- `Schema Options` (Object): an object to specify which class and fields should be ignored. `{ignoreClasses: [], ignoreAttributes: []}`
 
 #### Returns:
 
@@ -74,7 +63,6 @@ const allSchema = [
       objectId: {type: 'String'},
       createdAt: {type: 'Date'},
       updatedAt: {type: 'Date'},
-      ACL: {type: 'ACL'},
       someField: {type: 'String', required: true},
       anotherField: {type: 'Number', defaultValue: 0},
       pointerField: {type: 'Pointer', targetClass: 'AnotherClass'},
@@ -99,20 +87,20 @@ const allSchema = [
       objectId: {type: 'String'},
       createdAt: {type: 'Date'},
       updatedAt: {type: 'Date'},
-      ACL: {type: 'ACL'},
       /* Builtin Parse Classes e.g. (User, Role, etc.) must be referneced by a "_" before its name.*/
       user: {type: 'Pointer', targetClass: '_User'},
     },
   },
 ];
 
-const results = await manageSchema(allSchemas, {commit:false,remove:false,purge:false},{
+const results = await manageSchema(allSchemas, {commit:false,remove:false,purge:false},
+{
   fields: false,
   indexes: false,
   classLevelPermissions: false,
 } , {
-  ignoreClasses: [""]
-  ignoreAttributes: [""];
+  ignoreClasses: ["_User", "_Role", "_Session"]
+  ignoreAttributes: ["createdAt", "updatedAt"];
 });
 console.log(results);
 ```
@@ -165,18 +153,36 @@ This output provides a detailed breakdown of the changes:
 #### Schema Definition Structure:
 
 ```javascript
-const SCHEMA_NAME = () => {
-  const obj = {
-    fieldName: {
-      type: 'DataType',
-      options: {
-        /* field options */
-      },
+const SCHEMA_STRUCTURE_EXAMPLE = {
+  className: 'Player',
+  fields: {
+    User: {
+      type: 'Pointer',
+      targetClass: '_User',
     },
-    // ... other fields
-  };
-  const indexes = {indexName: {fieldName: 1}};
-  return {TableName: {fields: obj, indexes}};
+    age: {
+      type: 'Number',
+      defaultValue: 13,
+    },
+    name: {
+      type: 'String',
+      required: true,
+    },
+  },
+  indexes: {
+    _id_: {_id: 1},
+    name_1: {name: 1},
+  },
+  classLevelPermissions: {
+    find: {'*': true},
+    count: {'*': true},
+    get: {'*': true},
+    create: {'*': true},
+    update: {'*': true},
+    delete: {'*': true},
+    addField: {'*': true},
+    protectedFields: {'*': []},
+  },
 };
 ```
 
@@ -184,10 +190,10 @@ For detailed information on how to define schemas, please refer to the [Parse Se
 
 #### Behavior:
 
-- When all boolean flags (commit, remove, purge) are false, this function only shows the differences between the current database schema and your defined schema.
-- Setting `commit` to true applies additions and changes to columns and tables.
-- Setting `remove` to true allows removal of columns and tables.
-- The `purge` flag is used when you want to remove a non-empty table, deleting all rows before removal.
+- When all boolean flags (`commit`, `remove`, `purge`) are `false`, this function only shows the differences between the current database schema and your defined schema.
+- Setting `commit` to `true` applies additions and changes to columns and tables.
+- Setting `remove` to `true` allows removal of empty columns or tables.
+- The `purge` flag is used when you want to remove a non-empty table, deleting all data in it before removal.
 
 This function allows you to manage your Parse Server schema through code, providing version control, easy reviewing of changes, and flexible application of schema updates.
 
@@ -238,10 +244,35 @@ Parse.Cloud.define('configureSchemas', async (request) => {
   const commit = request.params?.commit;
   const remove = request.params?.remove;
   const purge = request.params?.purge;
-  const allSchemas = {
-    /* Define your schemas here */
-  };
-  return await manageSchema(allSchemas, commit, remove, purge);
+  const allSchemas = [
+    {
+      className: 'Player',
+      fields: {
+        User: {
+          type: 'Pointer',
+          targetClass: '_User',
+        },
+        age: {
+          type: 'Number',
+          defaultValue: 13,
+        },
+        name: {
+          type: 'String',
+          required: true,
+        },
+      },
+    },
+  ];
+
+  return await manageSchema(
+    allSchemas,
+    {commit, remove, purge},
+    {fields: true, indexes: true, classLevelPermissions: true},
+    {
+      ignoreClasses: ['_Session', '_Role'],
+      ignoreAttributes: ['createdAt', 'updatedAt', 'objectId'],
+    }
+  );
 });
 ```
 
