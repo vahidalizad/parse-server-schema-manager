@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "target": "es2016" /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */,
-    "module": "Preserve" /* Specify what module code is generated. */,
+    "module": "CommonJS" /* Specify what module code is generated. */,
     "baseUrl": "./" /* Specify the base directory to resolve non-relative module names. */,
     "paths": {
       "@Constants/*": ["src/constants/*"],
@@ -10,8 +10,7 @@
       "@test/*": ["test/*"]
     },
     "allowJs": true /* Allow JavaScript files to be a part of your program. Use the 'checkJS' option to get errors from these files. */,
-    "noEmit": true,
-    "declaration": false /* Generate .d.ts files from TypeScript and JavaScript files in your project. */,
+    "declaration": true /* Generate .d.ts files from TypeScript and JavaScript files in your project. */,
     "emitDeclarationOnly": false /* Only output d.ts files and not JavaScript files. */,
     "isolatedModules": true /* Ensure that each file can be safely transpiled without relying on other imports. */,
     "allowSyntheticDefaultImports": true,
@@ -24,7 +23,9 @@
     "skipLibCheck": true /* Skip type checking all .d.ts files. */,
     "removeComments": true,
     "inlineSourceMap": true,
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "outDir": "dist"
   },
-  "include": ["**/*.js", "**/*.ts"]
+  "include": ["src/**/*.js", "src/**/*.ts"],
+  "exclude": ["dist"]
 }

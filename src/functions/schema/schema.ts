@@ -197,13 +197,8 @@ type SchemaOutputOptions = {
 
 const wait = (t: number) => new Promise((r) => setTimeout(r, t));
 
-const getAllParseSchema = async () => {
-  try {
-    return await Parse.Schema.all();
-  } catch (e) {
-    await wait(1000);
-    return await getAllParseSchema();
-  }
+const getAllParseSchema = async (): Promise<Parse.RestSchema[]> => {
+  return await Parse.Schema.all();
 };
 
 /**
@@ -216,14 +211,14 @@ const getAllParseSchema = async () => {
 export const getAllSchemas = async (
   parts: SchemaParts = {},
   outputOptions: SchemaOutputOptions = {}
-) => {
+): Promise<Array<ParseClassSchema>> => {
   const schemaParts = sanitizeSchemaParts(parts);
   const options = sanitizeSchemaOptions(outputOptions);
 
   const {ignoreClasses, ignoreAttributes} = options;
   const list = await getAllParseSchema();
   const clone = structuredClone(list).filter(
-    (c) => !ignoreClasses.includes(c.className)
+    (c: Parse.RestSchema) => !ignoreClasses.includes(c.className)
   );
 
   const returnList = [];

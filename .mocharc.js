@@ -15,11 +15,11 @@ module.exports = {
   require: [
     '@babel/register',
     'ts-node/register',
-    'mocha-suppress-logs',
+    // 'mocha-suppress-logs',
     'test/hooks.js',
   ],
   globals: ['Parse'],
-  extensions: ['ts', 'tsx', 'js', 'jsx'],
+  extensions: ['ts', 'js'],
   exit: true,
   // delay: true,
   'check-leaks': true,

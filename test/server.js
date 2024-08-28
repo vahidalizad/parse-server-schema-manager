@@ -57,11 +57,3 @@ export const reconfigureServer = async () => {
   //   });
   return parseServer;
 };
-
-export const checkParseSanity = async () => {
-  try {
-    await Parse.Schema.all();
-  } catch (e) {
-    await reconfigureServer();
-  }
-};

@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "babel src -d dist --extensions \".ts,.js\" --copy-files",
-    "make": "tsc -p tsconfig.build.json",
+    "make": "tsc",
     "type-check": "tsc",
     "test": "mocha",
     "coverage": "nyc mocha",
