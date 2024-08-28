@@ -1,4 +1,7 @@
 .npmrc
+logs/
 dist/
 node_modules/
+coverage/
+.nyc_output/
 .env

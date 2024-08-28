@@ -5,7 +5,9 @@
     "baseUrl": ".",
     "paths": {
       "@Constants/*": ["src/constants/*"],
-      "@Functions/*": ["src/functions/*"]
+      "@Functions/*": ["src/functions/*"],
+      "@Types/*": ["src/types/*"],
+      "@test/*": ["test/*"]
     }
   }
 }

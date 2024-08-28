@@ -1,0 +1,25 @@
+[
+  {
+    "className": "Test",
+    "fields": {
+      "objectId": {"type": "String"},
+      "createdAt": {"type": "Date"},
+      "updatedAt": {"type": "Date"},
+      "name": {"type": "String"},
+      "age": {"type": "Number"}
+    },
+    "indexes": {
+      "_id_": {"_id": 1}
+    },
+    "classLevelPermissions": {
+      "addField": {"*": true},
+      "count": {"*": true},
+      "create": {"*": true},
+      "delete": {"*": true},
+      "find": {"*": true},
+      "get": {"*": true},
+      "update": {"*": true},
+      "protectedFields": {"*": []}
+    }
+  }
+]
