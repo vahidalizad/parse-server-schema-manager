@@ -93,15 +93,19 @@ const allSchema = [
   },
 ];
 
-const results = await manageSchema(allSchemas, {commit:false,remove:false,purge:false},
-{
-  fields: false,
-  indexes: false,
-  classLevelPermissions: false,
-} , {
-  ignoreClasses: ["_User", "_Role", "_Session"]
-  ignoreAttributes: ["createdAt", "updatedAt"];
-});
+const results = await manageSchema(
+  allSchemas,
+  {commit:false,remove:false,purge:false},
+  {
+    fields: true,
+    indexes: true,
+    classLevelPermissions: true,
+  },
+  {
+    ignoreClasses: ["_User", "_Role", "_Session"],
+    ignoreAttributes: ["createdAt", "updatedAt"]
+  }
+);
 console.log(results);
 ```
 
