@@ -18,6 +18,7 @@ const isReady = async () => {
 
 export const mochaHooks = {
   async beforeAll() {
+    this.timeout(50000);
     process.env.TESTING = true;
 
     let openPort = await detect(port);
