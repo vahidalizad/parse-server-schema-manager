@@ -29,7 +29,6 @@ const defaultConfiguration = {
   emailAdapter: MockEmailAdapterWithOptions(),
   port,
   mountPath,
-  enableInsecureAuthAdapters: false,
 };
 
 let parseServer;
