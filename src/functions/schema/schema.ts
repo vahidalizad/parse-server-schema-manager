@@ -111,7 +111,7 @@ export const diffingIndexes = (
   for (let key in obj1) if (!obj2[key]) remove[key] = obj1[key];
 
   for (let key in obj2) {
-    if (!obj1[key]) {
+    if (!obj1?.[key]) {
       add[key] = obj2[key];
       continue;
     }

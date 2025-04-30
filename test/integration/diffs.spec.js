@@ -42,6 +42,7 @@ describe('Test Diffs', function () {
         className: '_User',
         fields: {},
         classLevelPermissions: {
+          ACL: {'*': {read: true, write: true}},
           addField: {'*': true},
           count: {'*': true},
           create: {'*': true},

@@ -103,14 +103,14 @@ export const syncSchemaWithObject = async (
     }
   }
 
-  if (!changedIndexes) return;
-
-  // add removed indexes
-  for (let cKey in available.indexes) {
-    if (ignoreIndexesKeys.includes(cKey)) continue;
-    if (!indexesKeys.includes(cKey)) continue;
-    if (!checkSame(indexes[cKey], available.indexes[cKey]))
-      schema.addIndex(cKey, indexes[cKey]);
+  if (changedIndexes) {
+    // add removed indexes
+    for (let cKey in available.indexes) {
+      if (ignoreIndexesKeys.includes(cKey)) continue;
+      if (!indexesKeys.includes(cKey)) continue;
+      if (!checkSame(indexes[cKey], available.indexes[cKey]))
+        schema.addIndex(cKey, indexes[cKey]);
+    }
   }
 
   await saveSchema(schema);
