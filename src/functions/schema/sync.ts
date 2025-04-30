@@ -7,9 +7,9 @@ const globalKeys = ['objectId', 'updatedAt', 'createdAt', 'ACL'];
 
 const saveSchema = async (schema: Parse.Schema) => {
   try {
-    await schema.update();
+    return await schema.update();
   } catch (e) {
-    await schema.save();
+    return await schema.save();
   }
 };
 
@@ -85,7 +85,7 @@ export const syncSchemaWithObject = async (
 
   // sync CLP
   schema.setCLP(CLP);
-  await saveSchema(schema);
+  schema = await saveSchema(schema);
 
   // sync indexes
   for (let key in indexes)
@@ -113,5 +113,5 @@ export const syncSchemaWithObject = async (
     }
   }
 
-  await saveSchema(schema);
+  schema = await saveSchema(schema);
 };
