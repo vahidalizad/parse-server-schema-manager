@@ -7,9 +7,9 @@ const globalKeys = ['objectId', 'updatedAt', 'createdAt', 'ACL'];
 
 const saveSchema = async (schema: Parse.Schema) => {
   try {
-    return await schema.update();
+    await schema.update();
   } catch (e) {
-    return await schema.save();
+    await schema.save();
   }
 };
 
@@ -85,14 +85,16 @@ export const syncSchemaWithObject = async (
 
   // sync CLP
   schema.setCLP(CLP);
-  schema = await saveSchema(schema);
+  await saveSchema(schema);
 
   // sync indexes
-  for (let key in indexes)
-    if (!available.indexes || !available.indexes[key])
-      schema.addIndex(key, indexes[key]);
-
   let changedIndexes = false;
+  for (let key in indexes)
+    if (!available.indexes || !available.indexes[key]) {
+      changedIndexes = true;
+      schema.addIndex(key, indexes[key]);
+    }
+
   let indexesKeys = Object.keys(indexes);
   for (let cKey in available.indexes) {
     if (ignoreIndexesKeys.includes(cKey)) continue;
@@ -104,14 +106,19 @@ export const syncSchemaWithObject = async (
   }
 
   if (changedIndexes) {
-    // add removed indexes
-    for (let cKey in available.indexes) {
-      if (ignoreIndexesKeys.includes(cKey)) continue;
-      if (!indexesKeys.includes(cKey)) continue;
-      if (!checkSame(indexes[cKey], available.indexes[cKey]))
-        schema.addIndex(cKey, indexes[cKey]);
+    await schema.update();
+    changedIndexes = false;
+  }
+
+  // add removed indexes
+  for (let cKey in available.indexes) {
+    if (ignoreIndexesKeys.includes(cKey)) continue;
+    if (!indexesKeys.includes(cKey)) continue;
+    if (!checkSame(indexes[cKey], available.indexes[cKey])) {
+      changedIndexes = true;
+      schema.addIndex(cKey, indexes[cKey]);
     }
   }
 
-  schema = await saveSchema(schema);
+  if (changedIndexes) await schema.update();
 };
