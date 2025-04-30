@@ -1,6 +1,6 @@
 {
   "name": "parse-server-schema-manager",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "description": "Parse server schema manager",
   "main": "index.js",
   "scripts": {
