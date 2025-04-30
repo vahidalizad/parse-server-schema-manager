@@ -9,7 +9,11 @@ const saveSchema = async (schema: Parse.Schema) => {
   try {
     await schema.update();
   } catch (e) {
-    await schema.save();
+    try {
+      await schema.save();
+    } catch {
+      throw e;
+    }
   }
 };
 
@@ -88,37 +92,27 @@ export const syncSchemaWithObject = async (
   await saveSchema(schema);
 
   // sync indexes
-  let changedIndexes = false;
   for (let key in indexes)
-    if (!available.indexes || !available.indexes[key]) {
-      changedIndexes = true;
+    if (!available.indexes || !available.indexes[key])
       schema.addIndex(key, indexes[key]);
-    }
 
   let indexesKeys = Object.keys(indexes);
   for (let cKey in available.indexes) {
     if (ignoreIndexesKeys.includes(cKey)) continue;
     if (!indexesKeys.includes(cKey)) schema.deleteIndex(cKey);
-    else if (!checkSame(indexes[cKey], available.indexes[cKey])) {
-      changedIndexes = true;
+    else if (!checkSame(indexes[cKey], available.indexes[cKey]))
       schema.deleteIndex(cKey);
-    }
   }
 
-  if (changedIndexes) {
-    await schema.update();
-    changedIndexes = false;
-  }
+  await schema.update();
 
   // add removed indexes
   for (let cKey in available.indexes) {
     if (ignoreIndexesKeys.includes(cKey)) continue;
     if (!indexesKeys.includes(cKey)) continue;
-    if (!checkSame(indexes[cKey], available.indexes[cKey])) {
-      changedIndexes = true;
+    if (!checkSame(indexes[cKey], available.indexes[cKey]))
       schema.addIndex(cKey, indexes[cKey]);
-    }
   }
 
-  if (changedIndexes) await schema.update();
+  await schema.update();
 };
