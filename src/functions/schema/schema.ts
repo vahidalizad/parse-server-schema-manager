@@ -1,7 +1,7 @@
 import {ParseClassSchema, ParseFields} from '@Types/fields';
 import {checkSame} from '../object';
+import {getParseInstance} from '../parse';
 import {syncSchemaWithObject} from './sync';
-import Parse from 'parse/node';
 
 const checkSecondProperties = ['type'];
 
@@ -198,6 +198,7 @@ type SchemaOutputOptions = {
 const wait = (t: number) => new Promise((r) => setTimeout(r, t));
 
 const getAllParseSchema = async (): Promise<Parse.RestSchema[]> => {
+  const Parse = getParseInstance();
   return await Parse.Schema.all();
 };
 
@@ -375,13 +376,15 @@ export const manageSchema = async (
     log = 'Schema synced!';
   }
 
-  if (remove)
+  if (remove) {
+    const Parse = getParseInstance();
     for (let key in addRemove.remove ?? {}) {
       const mySchema = new Parse.Schema(key);
       if (purge) await mySchema.purge();
       await mySchema.delete();
       log = 'Schema synced!';
     }
+  }
 
   const output: Record<string, any> = {...addRemove, log};
   if (Object.keys(changesDiff).length) {
