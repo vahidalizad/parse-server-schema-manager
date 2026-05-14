@@ -1,4 +1,4 @@
-import {ParseClassSchema, ParseField, ParseFieldPointer} from '@Types/fields';
+import {ParseClassSchema, ParseField, ParseFieldPointer} from '../../types/fields';
 import {checkSame} from '../object';
 import {getParseInstance} from '../parse';
 

@@ -5,3 +5,7 @@ node_modules/
 coverage/
 .nyc_output/
 .env
+.env.*
+!.env.example
+.lock-*.tmp
+*.tgz
