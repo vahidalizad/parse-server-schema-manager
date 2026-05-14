@@ -1,6 +1,6 @@
 {
   "name": "parse-server-schema-manager",
-  "version": "2.1.2",
+  "version": "3.0.1",
   "description": "Schema-as-code utilities for managing Parse Server schemas, indexes, and class-level permissions.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
