@@ -1,0 +1,7 @@
+[install]
+minimumReleaseAge = 172800
+
+[test]
+preload = ["./test/hooks.js"]
+timeout = 50000
+maxConcurrency = 1
