@@ -177,6 +177,8 @@ Pointer and relation fields should include `targetClass`.
 
 ## Development
 
+Integration tests expect MongoDB to be available at `mongodb://127.0.0.1:27017/schema-test`. The GitHub Actions workflow starts MongoDB as a service container; for local development, start MongoDB before running the test suite.
+
 ```shell
 bun install
 bun run type-check
@@ -185,7 +187,23 @@ bun run build
 npm pack --dry-run --ignore-scripts
 ```
 
-The package publishes the built `dist` files, `README.md`, and `LICENSE`. Run `bun run pack:check` before publishing to verify the npm package contents.
+The package publishes the built `dist` files, `README.md`, `CHANGELOG.md`, and `LICENSE`. Run `bun run pack:check` before publishing to verify the npm package contents.
+
+## Release
+
+Publishing is intentionally tied to GitHub Releases, not ordinary merges to `main`.
+
+1. Merge the release PR into `main`.
+2. Create and publish a GitHub Release with a tag that matches the package version, for example `v3.0.1`.
+3. The `release.published` workflow builds the package and runs `npm publish --provenance`.
+
+This repository uses npm trusted publishing through GitHub Actions OIDC. Do not add an `NPM_TOKEN` to the workflow. The npm trusted publisher should be configured for:
+
+- Repository: `vahidalizad/parse-server-schema-manager`
+- Workflow: `.github/workflows/cd.yml`
+- Environment: `npm`
+
+The publish job declares `id-token: write` and the `npm` environment so npm can verify the trusted publisher identity.
 
 ## Contributing
 

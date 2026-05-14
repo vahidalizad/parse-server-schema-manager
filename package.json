@@ -15,6 +15,7 @@
   "files": [
     "dist",
     "README.md",
+    "CHANGELOG.md",
     "LICENSE"
   ],
   "packageManager": "bun@1.3.0",
