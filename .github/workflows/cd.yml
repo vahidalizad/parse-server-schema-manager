@@ -4,43 +4,60 @@ on:
   push:
     branches:
       - main
-  pull_request:
-    branches:
-      - main
-  release:
-    types:
-      - published
 
 jobs:
   test:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
     steps:
-      - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v2
-      - run: bun install --frozen-lockfile
-      - run: bun run ci
+      - uses: actions/checkout@v2
+      - name: Use Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '20'
+      - name: Setup pnpm
+        run: npm install -g pnpm
+      - run: pnpm install
+      - run: pnpm run ci
       - uses: codecov/codecov-action@v4
         with:
           fail_ci_if_error: false
           token: ${{ secrets.CODECOV_TOKEN }}
 
-  publish:
-    if: github.event_name == 'release'
+  deploy:
     needs: test
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      id-token: write
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v2
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v2
+      - name: Use Node.js
+        uses: actions/setup-node@v2
         with:
-          node-version: 24
-          registry-url: https://registry.npmjs.org
-      - run: npm install -g npm@latest
-      - run: bun install --frozen-lockfile
-      - run: bun run build
-      - run: npm publish --provenance
+          node-version: '20'
+      - name: Setup pnpm
+        run: npm install -g pnpm
+      - run: pnpm install
+      - run: pnpm run make
+
+      - name: Authenticate with npm
+        run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+
+      - name: Publish package
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Post-publish cleanup
+        run: rm ~/.npmrc
+
+      # - name: Get version from package.json
+      #   run: echo "VERSION=$(node -p require\(\"./package.json\"\).version)" >> $GITHUB_ENV
+
+      # - name: Create GitHub Release
+      #   uses: actions/create-release@v1
+      #   with:
+      #     tag_name: v${{ env.VERSION }}
+      #     release_name: Release v${{ env.VERSION }}
+      #     draft: false
+      #     prerelease: false
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,14 @@
+{
+  "reporter": ["text", "lcov"],
+  "exclude": [
+    "coverage/**",
+    "test/**",
+    "dist/**",
+    "node_modules/**",
+    "**/*.d.ts"
+  ],
+  "extension": [".js", ".ts"],
+  "require": ["@babel/register"],
+  "sourceMap": true,
+  "instrument": true
+}

@@ -1,7 +1,6 @@
 import Parse from 'parse/node';
 import {TestUtils} from 'parse-server';
 import detect from 'detect-port';
-import {afterAll, beforeAll} from 'bun:test';
 import {port, reconfigureServer, serverURL} from './server';
 
 const wait = (t) => new Promise((r) => setTimeout(r, t));
@@ -17,26 +16,28 @@ const isReady = async () => {
   }
 };
 
-beforeAll(async () => {
-  process.env.TESTING = true;
+export const mochaHooks = {
+  async beforeAll() {
+    this.timeout(50000);
+    process.env.TESTING = true;
 
-  const openPort = await detect(port);
-  if (openPort === port) {
-    console.log('Initiating parse server instance');
-    await reconfigureServer();
-  } else console.log('Using the running parse server.');
+    let openPort = await detect(port);
+    if (openPort === port) {
+      console.log('Initiating parse server instance');
+      await reconfigureServer();
+    } else console.log('Using the running parse server.');
 
-  Parse.initialize('dev');
-  Parse.serverURL = serverURL;
-  Parse.CoreManager.set('SERVER_URL', serverURL);
-  Parse.CoreManager.set('MASTER_KEY', 'devdevdev');
-  globalThis.Parse = Parse;
+    Parse.initialize('dev');
+    Parse.serverURL = serverURL;
+    Parse.CoreManager.set('SERVER_URL', serverURL);
+    Parse.CoreManager.set('MASTER_KEY', 'devdevdev');
 
-  await isReady();
-});
+    await isReady();
+  },
 
-afterAll(async () => {
-  await Parse.User.logOut();
-  Parse.Storage._clear();
-  await TestUtils.destroyAllDataPermanently(true);
-});
+  async afterAll() {
+    await Parse.User.logOut();
+    Parse.Storage._clear();
+    await TestUtils.destroyAllDataPermanently(true);
+  },
+};

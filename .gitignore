@@ -3,10 +3,5 @@ logs/
 dist/
 node_modules/
 coverage/
-.coverage/
 .nyc_output/
 .env
-.env.*
-!.env.example
-.lock-*.tmp
-*.tgz

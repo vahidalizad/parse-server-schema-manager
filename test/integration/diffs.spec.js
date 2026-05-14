@@ -1,4 +1,5 @@
-import {describe, expect, it} from 'bun:test';
+import {describe, it} from 'mocha';
+import {expect} from 'chai';
 import Parse from 'parse/node';
 import {
   diffingCLP,
@@ -20,7 +21,7 @@ describe('Test Diffs', function () {
       },
       options
     );
-    expect(list).toEqual([
+    expect(list).to.deep.equal([
       {
         className: '_User',
         fields: {
@@ -36,7 +37,7 @@ describe('Test Diffs', function () {
       },
     ]);
     const list2 = await getAllSchemas({fields: false}, options);
-    expect(list2).toEqual([
+    expect(list2).to.deep.equal([
       {
         className: '_User',
         fields: {},
@@ -52,10 +53,7 @@ describe('Test Diffs', function () {
           update: {'*': true},
         },
         indexes: {
-          _auth_data_anonymous_id: {'_auth_data_anonymous.id': 1},
-          _email_verify_token: {_email_verify_token: 1},
           _id_: {_id: 1},
-          _perishable_token: {_perishable_token: 1},
           case_insensitive_email: {email: 1},
           case_insensitive_username: {username: 1},
           email_1: {email: 1},
@@ -85,7 +83,7 @@ describe('Test Diffs', function () {
         followers: {type: 'Relation', targetClass: '_User'},
       }
     );
-    expect(diffs).toEqual({
+    expect(diffs).to.deep.equal({
       add: {followers: {type: 'Relation', targetClass: '_User'}},
       change: {name: ['required: undefined -> true']},
       remove: {
@@ -108,7 +106,7 @@ describe('Test Diffs', function () {
         username_2: {username: 1},
       }
     );
-    expect(diffs).toEqual({
+    expect(diffs).to.deep.equal({
       add: {username_2: {username: 1}},
       remove: {username_1: {username: 1}},
       change: {
@@ -141,7 +139,7 @@ describe('Test Diffs', function () {
         protectedFields: {'*': ['user']},
       }
     );
-    expect(diffs).toEqual({
+    expect(diffs).to.deep.equal({
       find: {from: {'*': true}, to: {requiresAuthentication: true}},
       create: {
         from: {'*': true},

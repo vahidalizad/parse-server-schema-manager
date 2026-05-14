@@ -1,6 +1,7 @@
 import {manageSchema} from '@Functions/schema';
 import {saveToDatabase} from '@test/helper';
-import {afterEach, describe, expect, it} from 'bun:test';
+import {expect} from 'chai';
+import {describe, it} from 'mocha';
 import DefaultSchema from '../assets/default-schema.json';
 import TestSchema from '../assets/test-schema.json';
 
@@ -34,7 +35,9 @@ describe('Reset Schemas', function () {
 });
 
 describe('Test Manage Schema', function () {
-  afterEach(async () => {
+  this.timeout(5000);
+
+  this.afterEach(async function () {
     await cleanSchema();
   });
 
@@ -45,7 +48,7 @@ describe('Test Manage Schema', function () {
       actionParts,
       schemaOptions
     );
-    expect(result).toEqual({
+    expect(result).to.deep.equal({
       add: {Test: TestSchema[0]},
       log: 'Schema synced!',
     });
@@ -55,7 +58,7 @@ describe('Test Manage Schema', function () {
       actionParts,
       schemaOptions
     );
-    expect(result2).toEqual({
+    expect(result2).to.deep.equal({
       remove: {Test: TestSchema[0]},
       log: 'Schema synced!',
     });
@@ -76,7 +79,7 @@ describe('Test Manage Schema', function () {
       schemaOptions
     );
     const resultSchema = {[schemaObject.className]: schemaObject};
-    expect(result).toEqual({
+    expect(result).to.deep.equal({
       add: resultSchema,
       log: 'Schema synced!',
     });
@@ -94,7 +97,7 @@ describe('Test Manage Schema', function () {
       schemaOptions
     );
     const resultSchema = {[newSchema.className]: newSchema};
-    expect(result).toEqual({
+    expect(result).to.deep.equal({
       add: resultSchema,
       log: 'Nothing changed!',
     });
@@ -115,7 +118,7 @@ describe('Test Manage Schema', function () {
       schemaOptions
     );
     const resultSchema = {[modifiedSchema.className]: modifiedSchema};
-    expect(result).toEqual({
+    expect(result).to.deep.equal({
       add: resultSchema,
       log: 'Schema synced!',
     });
@@ -149,7 +152,7 @@ describe('Test Manage Schema', function () {
         },
       },
     };
-    expect(result).toEqual({
+    expect(result).to.deep.equal({
       changes: resultObject,
       log: 'Schema synced!',
     });
@@ -183,7 +186,7 @@ describe('Test Manage Schema', function () {
         },
       },
     };
-    expect(result).toEqual({
+    expect(result).to.deep.equal({
       changes: resultObject,
       log: 'Schema synced!',
     });
@@ -214,7 +217,7 @@ describe('Test Manage Schema', function () {
         },
       },
     };
-    expect(result).toEqual({
+    expect(result).to.deep.equal({
       changes: resultObject,
       log: 'Schema synced!',
     });
@@ -252,7 +255,7 @@ describe('Test Manage Schema', function () {
       },
     };
 
-    expect(result).toEqual({
+    expect(result).to.deep.equal({
       changes: resultObject,
       log: 'Schema synced!',
     });

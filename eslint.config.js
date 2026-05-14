@@ -1,10 +1,9 @@
-const tsParser = require('@typescript-eslint/parser');
+const babelParser = require('@babel/eslint-parser');
 const globals = require('globals');
 
 module.exports = {
-  files: ['src/**/*.{js,ts}'],
   languageOptions: {
-    parser: tsParser,
+    parser: babelParser,
     sourceType: 'module',
     globals: {
       ...globals.node,

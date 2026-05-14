@@ -1,6 +1,5 @@
-import {ParseClassSchema, ParseField, ParseFieldPointer} from '../../types/fields';
+import {ParseClassSchema, ParseField, ParseFieldPointer} from '@Types/fields';
 import {checkSame} from '../object';
-import {getParseInstance} from '../parse';
 
 const ignoreIndexesKeys = ['_id_'];
 
@@ -36,7 +35,6 @@ export const syncSchemaWithObject = async (
   ignoreAttributes: string[]
 ) => {
   if (!schemaObject) return;
-  const Parse = getParseInstance();
   let schema = new Parse.Schema(className);
   let available: Parse.RestSchema = {
     className: className,
@@ -90,7 +88,7 @@ export const syncSchemaWithObject = async (
   }
 
   // sync CLP
-  schema.setCLP(CLP as Record<string, Record<string, any>>);
+  schema.setCLP(CLP);
   await saveSchema(schema);
 
   // sync indexes

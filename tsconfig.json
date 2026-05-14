@@ -1,14 +1,14 @@
 {
   "compilerOptions": {
     "target": "es2016" /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */,
-    "module": "node20" /* Specify what module code is generated. */,
+    "module": "CommonJS" /* Specify what module code is generated. */,
+    "baseUrl": "./" /* Specify the base directory to resolve non-relative module names. */,
     "paths": {
-      "@Constants/*": ["./src/constants/*"],
-      "@Functions/*": ["./src/functions/*"],
-      "@Types/*": ["./src/types/*"],
-      "@test/*": ["./test/*"]
+      "@Constants/*": ["src/constants/*"],
+      "@Functions/*": ["src/functions/*"],
+      "@Types/*": ["src/types/*"],
+      "@test/*": ["test/*"]
     },
-    "types": ["@types/bun"],
     "allowJs": true /* Allow JavaScript files to be a part of your program. Use the 'checkJS' option to get errors from these files. */,
     "declaration": true /* Generate .d.ts files from TypeScript and JavaScript files in your project. */,
     "emitDeclarationOnly": false /* Only output d.ts files and not JavaScript files. */,
@@ -23,9 +23,8 @@
     "skipLibCheck": true /* Skip type checking all .d.ts files. */,
     "removeComments": true,
     "inlineSourceMap": true,
-    "moduleResolution": "node16",
-    "rootDir": "./src",
-    "outDir": "./dist"
+    "moduleResolution": "node",
+    "outDir": "dist"
   },
   "include": ["src/**/*.js", "src/**/*.ts"],
   "exclude": ["dist"]
